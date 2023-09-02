@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <title>{% block title %}My amazing site{% endblock %}</title>
+</head>
+
+<body>
+    <div class="menu">
+        {% block sidebar %}
+        <a class="menu-item" href="{% url 'commons:home' %}">Home</a>
+        <a class="menu-item bottom" href="{% url 'users:update_company' %}">My company</a>
+        <a class="menu-item" href="{% url 'users:logout' %}">Log out</a>
+        {% endblock %}
+    </div>
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

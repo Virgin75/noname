@@ -1,0 +1,17 @@
+{% extends "commons/base.html" %}
+{% block title %}Edit your company details:{% endblock %}
+{% block content %}
+    {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+  <h2>Edit your company details:</h2>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Validate</button>
+  </form>
+{% endblock %}

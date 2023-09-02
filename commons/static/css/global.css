@@ -1,0 +1,31 @@
+body {
+    display: flex;
+}
+.menu {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: #1b1b1b;
+    color: white;
+    height: 90vh;
+    padding: 2em;
+}
+.menu-item {
+    text-decoration: none;
+    color: white;
+    font-size: 2rem;
+    padding-bottom: 20px;
+}
+.bottom {
+    margin-top: auto;
+}
+.menu-item:hover {
+    color: #aeaeae;
+}
+.content {
+    display: flex;
+    flex: 4;
+    flex-direction: column;
+    background-color: #f1f1f1;
+    padding: 2em;
+}
