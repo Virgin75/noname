@@ -1,0 +1,8 @@
+{% block content %}
+  <h2>What is your company named?</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Validate</button>
+  </form>
+{% endblock %}

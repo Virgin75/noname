@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "6379:6379"
+
+  rq_workers:
+    build: .
+    # TODO: create custom command to start the CRON tasks in settings.py
+    command: python manage.py rqworker --with-scheduler
+    depends_on:
+      - redis
+
+  postgres_test:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: default_database

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -68,17 +69,29 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'noname.wsgi.application'
+AUTH_USER_MODEL = 'users.Account'
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+DATABASES_POSTGRES_LOCAL = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': "default_database",
+    'USER': "username",
+    'PASSWORD': "password",
+    'HOST': "localhost",
+    'PORT': 5432,
 }
+
+DATABASES = {}
+match os.environ.get('env'):
+    case 'local':
+        DATABASES['default'] = DATABASES_POSTGRES_LOCAL
+    case 'test':
+        pass
+    case 'prod':
+        pass
 
 
 # Password validation
