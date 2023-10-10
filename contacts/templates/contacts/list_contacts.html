@@ -1,0 +1,27 @@
+{% extends "commons/base.html" %}
+
+{% block title %}My amazing site{% endblock %}
+
+{% block content %}
+    <h1>Your subscribers:</h1>
+    {%  include "commons/ordering.html" %}
+    {%  include "commons/filters.html" %}
+
+    <table>
+        <tr>
+            {% for field in fields %}
+                <td><b>{{field}}</b></td>
+            {% endfor %}
+        </tr>
+        {% for contact in filter.qs %}
+            <tr>
+            {% for key,val in contact.items %}
+                <td>{{val}}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    {%  include "commons/pagination.html" %}
+{% endblock %}

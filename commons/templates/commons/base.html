@@ -10,6 +10,7 @@
     <div class="menu">
         {% block sidebar %}
         <a class="menu-item" href="{% url 'commons:home' %}">Home</a>
+        <a class="menu-item" href="{% url 'contacts:list_contacts' %}">Subscribers</a>
         <a class="menu-item bottom" href="{% url 'users:update_company' %}">My company</a>
         <a class="menu-item" href="{% url 'users:logout' %}">Log out</a>
         {% endblock %}

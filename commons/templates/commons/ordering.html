@@ -1,0 +1,7 @@
+<div class="ordering">
+    <span>Order by: </span>
+        {% for field in ordering_fields %}
+            <a href="?ordering={{ field }}">{{ field }}</a>
+        {% endfor %}
+<br>
+</div>

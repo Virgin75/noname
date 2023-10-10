@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('', include(('commons.urls', 'commons'), namespace='commons')),
+    path('contacts/', include(('contacts.urls', 'contacts'), namespace='contacts')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.ENV == 'local' else []
