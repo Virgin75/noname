@@ -7,10 +7,14 @@
 </head>
 
 <body>
+    {% url 'contacts:list_contacts' as list_contacts_url %}
     <div class="menu">
         {% block sidebar %}
         <a class="menu-item" href="{% url 'commons:home' %}">Home</a>
         <a class="menu-item" href="{% url 'contacts:list_contacts' %}">Subscribers</a>
+            {% if request.path == list_contacts_url %}
+                <a class="menu-item" href="{% url 'contacts:create_contact' %}">-- Custom fields</a>
+            {% endif %}
         <a class="menu-item bottom" href="{% url 'users:update_company' %}">My company</a>
         <a class="menu-item" href="{% url 'users:logout' %}">Log out</a>
         {% endblock %}

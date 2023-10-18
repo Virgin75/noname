@@ -21,7 +21,14 @@ class AllowedField(models.Model):
     """
     List of fields that can be used in the 'fields' attribute of a Contact (per Company).
     """
+    ALLOWED_TYPES = (
+        ('str', 'Text'),
+        ('number', 'Number'),
+        ('date', 'Date'),
+        ('bool', 'Boolean'),
+    )
     name = models.CharField(max_length=80)
+    type = models.CharField(max_length=20, choices=ALLOWED_TYPES, default=ALLOWED_TYPES[0][0])
     belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:

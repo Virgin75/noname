@@ -1,13 +1,16 @@
 {% extends "commons/base.html" %}
 
-{% block title %}My amazing site{% endblock %}
+{% block title %}Noname{% endblock %}
 
 {% block content %}
     <h1>Your subscribers:</h1>
-    {%  include "commons/ordering.html" %}
-    {%  include "commons/filters.html" %}
-
-    <table>
+    <a href="{% url 'contacts:create_contact' %}">+ Create a new Contact</a>
+    {% if not filter.qs %}
+        <h2>There is no contact.</h2>
+    {% else %}
+        {%  include "commons/ordering.html" %}
+        {%  include "commons/filters.html" %}
+       <table>
         <tr>
             {% for field in fields %}
                 <td><b>{{field}}</b></td>
@@ -24,4 +27,7 @@
 
     <br>
     {%  include "commons/pagination.html" %}
+
+    {% endif %}
+
 {% endblock %}
