@@ -1,0 +1,30 @@
+{% extends "commons/base.html" %}
+
+{% block title %}Custom fields{% endblock %}
+
+{% block content %}
+    <h1>Manage your subscribers' custom fields:</h1>
+    <a href="{% url 'contacts:create_custom_field' %}">+ Create a new field</a>
+    {% if not filter.qs %}
+        <h2>You have no custom field.</h2>
+    {% else %}
+       <table>
+        <tr>
+            {% for field in fields %}
+                <td><b>{{field}}</b></td>
+            {% endfor %}
+        </tr>
+        {% for field in filter.qs %}
+            <tr>
+                <td>{{ field.id }}</td>
+                <td>{{ field.name }}</td>
+                <td>{{ field.type }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    {% endif %}
+
+{% endblock %}

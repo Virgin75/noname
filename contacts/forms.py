@@ -19,3 +19,9 @@ class ContactForm(forms.ModelForm):
         self.fields.update({
             'fields__passion': forms.CharField(widget=forms.Textarea()),
         })
+
+
+class CustomFieldForm(forms.ModelForm):
+    class Meta:
+        model = AllowedField
+        exclude = ['belongs_to']
