@@ -16,9 +16,18 @@ class ContactForm(forms.ModelForm):
             AllowedField.objects.filter(belongs_to=self.request.user.company)
             .values('name', 'type')
         )
-        self.fields.update({
-            'fields__passion': forms.CharField(widget=forms.Textarea()),
-        })
+        fields = {}
+        for field in allowed_fields:
+            match field['type']:
+                case 'str':
+                    fields[f"fields__{field['name']}"] = forms.CharField(required=False)
+                case 'number':
+                    fields[f"fields__{field['name']}"] = forms.IntegerField(required=False, widget=forms.NumberInput())
+                case 'date':
+                    fields[f"fields__{field['name']}"] = forms.DateField(required=False)
+                case 'bool':
+                    fields[f"fields__{field['name']}"] = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+        self.fields.update(fields)
 
 
 class CustomFieldForm(forms.ModelForm):

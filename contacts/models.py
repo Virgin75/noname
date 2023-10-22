@@ -27,7 +27,7 @@ class AllowedField(models.Model):
         ('date', 'Date'),
         ('bool', 'Boolean'),
     )
-    name = models.CharField(max_length=80)
+    name = models.SlugField(max_length=50)
     type = models.CharField(max_length=20, choices=ALLOWED_TYPES, default=ALLOWED_TYPES[0][0])
     belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
 

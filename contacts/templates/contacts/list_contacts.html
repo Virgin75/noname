@@ -19,8 +19,10 @@
         {% for contact in filter.qs %}
             <tr>
             {% for key,val in contact.items %}
-                <td>{{val}}</td>
+                <td>{{ val|default:"" }}</td>
             {% endfor %}
+            <td><a href="{% url 'contacts:delete_contact' contact.id %}">Delete</a></td>
+            <td><a href="{% url 'contacts:update_contact' contact.id %}">Update</a></td>
             </tr>
         {% endfor %}
     </table>

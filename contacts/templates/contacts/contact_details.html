@@ -1,10 +1,10 @@
 {% extends "commons/base.html" %}
-{% block title %}Edit your company details:{% endblock %}
+{% block title %}Edit User:{% endblock %}
 {% block content %}
-  <h2>Edit your company details:</h2>
+  <h2>Edit "{{ object.email }}" Contact:</h2>
     <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Validate</button>
+    <button type="submit">Update</button>
   </form>
 {% endblock %}

@@ -19,6 +19,7 @@
                 <td>{{ field.id }}</td>
                 <td>{{ field.name }}</td>
                 <td>{{ field.type }}</td>
+                <td><a href="{% url 'contacts:delete_custom_field' field.id %}">Delete</a></td>
             </tr>
         {% endfor %}
     </table>
