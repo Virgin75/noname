@@ -1,0 +1,33 @@
+{% extends "commons/base.html" %}
+{% block title %}Edit Segment:{% endblock %}
+<script>
+
+</script>
+{% block content %}
+  <h2>Edit "{{ object.name }}" Segment:</h2>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <br>
+    <span>Select contacts matching with </span>...<span>of the following conditions:</span>
+        {% for group in object.filters %}
+            <div class="filter">
+                <select aria-label="field" name="field">
+                    {% for field in group.fields %}
+                        <option value="{{ field }}">{{ field }}</option>
+                    {% endfor %}
+                </select>
+                <select aria-label="operator" name="operator">
+                    {% for operator in group.operators %}
+                        <option value="{{ operator }}">{{ operator }}</option>
+                    {% endfor %}
+                </select>
+                <input aria-label="value" type="text" name="value" />
+            </div>
+        {% endfor %}
+    <br>
+    <button type="submit">Update</button>
+
+    <span style="color:red">{{ error }}</span>
+  </form>
+{% endblock %}

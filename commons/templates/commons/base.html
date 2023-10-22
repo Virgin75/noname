@@ -9,14 +9,23 @@
 <body>
     {% url 'contacts:list_contacts' as list_contacts_url %}
     {% url 'contacts:create_contact' as create_contact_url %}
+    {% url 'contacts:update_contact' as update_contact_url %}
+    {% url 'contacts:delete_contact' as delete_contact_url %}
     {% url 'contacts:list_custom_fields' as list_custom_fields_url %}
     {% url 'contacts:create_custom_field' as create_custom_field_url %}
+    {% url 'contacts:update_custom_field' as update_custom_field_url %}
+    {% url 'contacts:delete_custom_field' as delete_custom_field_url %}
+    {% url 'contacts:list_segments' as list_segments_url %}
+    {% url 'contacts:create_segment' as create_segments_url %}
+    {% url 'contacts:delete_segment' as delete_segment_url %}
+    {% url 'contacts:segment_details' as update_segment_url %}
     <div class="menu">
         {% block sidebar %}
         <a class="menu-item" href="{% url 'commons:home' %}">Home</a>
         <a class="menu-item" href="{% url 'contacts:list_contacts' %}">Subscribers</a>
-            {% if request.path == list_contacts_url or request.path == create_contact_url or request.path == list_custom_fields_url or request.path == create_custom_field_url%}
+            {% if request.path == list_contacts_url or request.path == create_contact_url or request.path == list_custom_fields_url or request.path == create_custom_field_url or request.path == update_contact_url or request.path == delete_contact_url or request.path == update_custom_field_url or request.path == delete_custom_field_url or request.path == create_segments_url or request.path == list_segments_url or request.path == delete_segment_url or request.path == update_segment_url%}
                 <a class="sub-menu-item" href="{% url 'contacts:list_custom_fields' %}">-- Custom fields</a>
+                <a class="sub-menu-item" href="{% url 'contacts:list_segments' %}">-- Segments</a>
             {% endif %}
         <a class="menu-item bottom" href="{% url 'users:update_company' %}">My company</a>
         <a class="menu-item" href="{% url 'users:logout' %}">Log out</a>

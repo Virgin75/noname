@@ -3,14 +3,14 @@ import datetime
 from django.urls import reverse_lazy
 
 from commons.views import OrderingMixin
-from contacts.forms import ContactForm, CustomFieldForm
-from contacts.models import Contact, AllowedField
+from contacts.forms import ContactForm, CustomFieldForm, SegmentForm
+from contacts.models import Contact, AllowedField, Segment
 from django.views.generic.edit import CreateView, FormView, BaseUpdateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.db.models.fields.json import KT
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from contacts.filters import ContactFilter, CustomFieldFilter
+from contacts.filters import ContactFilter, CustomFieldFilter, SegmentFilter
 
 
 class CreateContact(SuccessMessageMixin, LoginRequiredMixin, FormView):
@@ -137,3 +137,63 @@ class DeleteCustomField(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('contacts:list_custom_fields')
     success_message = 'Field deleted successfully.'
 
+
+class ListSegment(SuccessMessageMixin, LoginRequiredMixin, ListView):
+    template_name = 'contacts/list_segments.html'
+    paginate_by = 20
+
+    def get_queryset(self):
+        """Filter Segments with the user's Company."""
+        return Segment.objects.filter(belongs_to=self.request.user.company)
+
+    def get_context_data(self, **kwargs):
+        """Pass extra data to the template: fields names and filtered queryset."""
+        context = super().get_context_data(**kwargs)
+        context['fields'] = ['id', 'Name', 'Description', 'Members']
+        context['filter'] = SegmentFilter(self.request.GET, queryset=self.get_queryset())
+        return context
+
+
+class CreateSegment(SuccessMessageMixin, LoginRequiredMixin, FormView):
+    """View used to create a new Segment."""
+    template_name = 'contacts/create_segment.html'
+    form_class = SegmentForm
+    success_url = reverse_lazy('contacts:list_segments')
+    success_message = 'Segment created successfully.'
+
+    def form_valid(self, form):
+        """Override 'form_valid()' to update 'belongs_to' field."""
+        contact = form.save(commit=False)
+        contact.belongs_to = self.request.user.company
+        contact.save()
+        return super().form_valid(form)
+
+
+class DeleteSegment(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
+    """View used to delete a Segment."""
+    template_name = 'contacts/delete_segment.html'
+    model = Segment
+    success_url = reverse_lazy('contacts:list_segments')
+    success_message = 'Segment deleted successfully.'
+
+
+class UpdateSegmentView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
+    """View used to update a Segment."""
+    template_name = 'contacts/segment_details.html'
+    model = Segment
+    success_message = "Segment updated successfully."
+    success_url = reverse_lazy('contacts:list_segments')
+    form_class = SegmentForm
+
+    def get_form_kwargs(self):
+        """Override 'get_form_kwargs()' to pass the request data to the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        """Override 'form_valid()' to update the user JSONField() accordingly."""
+        contact = form.save(commit=False)
+        contact.updated_by = self.request.user
+        contact.save()
+        return super().form_valid(form)
