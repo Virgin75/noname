@@ -1,7 +1,7 @@
 from django.urls import path
 from contacts.views import (
     ListContact, CreateContact, ListCustomField, CreateCustomField, DeleteCustomField, DeleteContact, UpdateContactView,
-    ListSegment, CreateSegment, DeleteSegment, UpdateSegmentView
+    ListSegment, CreateSegment, DeleteSegment, UpdateSegmentView, UpdateGroupSegment, AddFilterView, UpdateFilterView
 )
 
 urlpatterns = [
@@ -16,4 +16,7 @@ urlpatterns = [
     path('segments/add', CreateSegment.as_view(), name='create_segment'),
     path('segments/<int:pk>/delete', DeleteSegment.as_view(), name='delete_segment'),
     path('segments/<int:pk>/update', UpdateSegmentView.as_view(), name='segment_details'),
+    path('groups/<int:pk>/update', UpdateGroupSegment.as_view(), name='update_group_segment'),
+    path('groups/<int:pk>/add_filter', AddFilterView.as_view(), name='add_filter'),
+    path('filters/<int:pk>/update', UpdateFilterView.as_view(), name='update_filter'),
 ]

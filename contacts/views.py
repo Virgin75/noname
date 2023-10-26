@@ -3,13 +3,15 @@ import datetime
 from django.urls import reverse_lazy
 
 from commons.views import OrderingMixin
-from contacts.forms import ContactForm, CustomFieldForm, SegmentForm
-from contacts.models import Contact, AllowedField, Segment
+from contacts.forms import ContactForm, CustomFieldForm, SegmentForm, GroupForm, FilterForm
+from contacts.models import Contact, AllowedField, Segment, Group, Filter
 from django.views.generic.edit import CreateView, FormView, BaseUpdateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.http import HttpResponse
 from django.db.models.fields.json import KT
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.template.response import TemplateResponse
 from contacts.filters import ContactFilter, CustomFieldFilter, SegmentFilter
 
 
@@ -154,19 +156,72 @@ class ListSegment(SuccessMessageMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class CreateSegment(SuccessMessageMixin, LoginRequiredMixin, FormView):
+class CreateSegment(LoginRequiredMixin, FormView):
     """View used to create a new Segment."""
     template_name = 'contacts/create_segment.html'
     form_class = SegmentForm
-    success_url = reverse_lazy('contacts:list_segments')
-    success_message = 'Segment created successfully.'
+
+    def get_form_kwargs(self):
+        """Override 'get_form_kwargs()' to pass the request data to the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def form_valid(self, form):
         """Override 'form_valid()' to update 'belongs_to' field."""
-        contact = form.save(commit=False)
-        contact.belongs_to = self.request.user.company
-        contact.save()
-        return super().form_valid(form)
+        segment = form.save(commit=False)
+        segment.belongs_to = self.request.user.company
+        segment.save()
+        group_form = GroupForm()
+        group = Group.objects.create(belongs_to=self.request.user.company, segment=segment)
+        return TemplateResponse(
+            self.request,
+            'contacts/create_group_conditions.html',
+            {'group': group, 'form': group_form, 'segment': segment}
+        )
+
+
+class UpdateGroupSegment(LoginRequiredMixin, FormView):
+    """View used to update a Group of filters."""
+    form_class = GroupForm
+
+    def form_valid(self, form):
+        """Override 'form_valid()' to update 'belongs_to' field."""
+        group = Group.objects.get(id=self.kwargs['pk'])
+        group.operator = form.cleaned_data['operator']
+        group.save()
+        print(group.operator, group.id)
+        return HttpResponse(status=200)
+
+
+class AddFilterView(LoginRequiredMixin, CreateView):
+    """View used to add a Filter in a Group of filters."""
+    def post(self, request, *args, **kwargs):
+        """return a new filter form."""
+        group = Group.objects.get(id=self.kwargs['pk'])
+        filter = Filter.objects.create(belongs_to=self.request.user.company)
+        group.filters.add(filter)
+        filter.save()
+        form = FilterForm(instance=filter)
+        return TemplateResponse(
+            request=request,
+            template='contacts/add_filter_form.html',
+            context={'form': form, 'filter': filter}
+        )
+
+
+class UpdateFilterView(LoginRequiredMixin, FormView):
+    """View used to update a Filter in a Group of filters."""
+    form_class = FilterForm
+
+    def form_valid(self, form):
+        """Update Filter fields."""
+        filter = Filter.objects.get(id=self.kwargs['pk'])
+        for k, v in form.cleaned_data.items():
+            setattr(filter, k, v)
+        filter.save()
+        return HttpResponse(status=200)
+
 
 
 class DeleteSegment(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
@@ -184,6 +239,14 @@ class UpdateSegmentView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
     success_message = "Segment updated successfully."
     success_url = reverse_lazy('contacts:list_segments')
     form_class = SegmentForm
+
+    def get(self, request, *args, **kwargs):
+        """Override 'get()' to add the GroupForm() to the context."""
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        groups = Group.objects.filter(segment=self.object).prefetch_related('filters')
+        context['group_forms'] = [(GroupForm(instance=group), group.id) for group in groups]
+        return TemplateResponse(request, self.template_name, context)
 
     def get_form_kwargs(self):
         """Override 'get_form_kwargs()' to pass the request data to the form."""

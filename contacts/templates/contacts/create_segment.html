@@ -3,10 +3,14 @@
 {% block title %}Create a new dynamic segment{% endblock %}
 
 {% block content %}
+    <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
     <h1>Create a new dynamic segment</h1>
     <form method="post">{% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Create">
+        <button hx-post="/segments/add" hx-target="#conditions-container">Create</button>
     </form>
     <br>
+    <div id="conditions-container">
+
+    </div>
 {% endblock %}

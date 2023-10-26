@@ -1,0 +1,20 @@
+<script>
+      document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      })
+</script>
+<h2>Define the conditions matching with your segment:</h2>
+<span>Contacts in this segment must match </span>
+<div style="border: solid 1px black;border-radius: 8px; padding: 1em;">
+    <form method="post" hx-post="/groups/{{group.id}}/update" hx-target="#useless" hx-trigger="change">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="segment_id" value="{{ segment.id }}">
+    </form>
+<span>of the following conditions:</span>
+    <br>
+    <button hx-post="/groups/{{group.id}}/add_filter" hx-target="#filters-container" hx-swap="beforeend">Add filter</button>
+    <div id="filters-container">
+    </div>
+    <div id="useless">
+    </div>
+</div>

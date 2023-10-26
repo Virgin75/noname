@@ -53,7 +53,6 @@ class Segment(HistoryMixin):
     description = models.TextField()
     belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
     members = models.ManyToManyField(Contact, related_name='segments')
-    filters = models.JSONField(default=list, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -61,3 +60,23 @@ class Segment(HistoryMixin):
     @property
     def members_count(self):
         return self.members.count()
+
+
+class Filter(models.Model):
+    """Filter used to create a Segment."""
+    FILTERS = (
+        ('email', 'Email'),
+        ('fields', 'Custom field'),
+    )
+    filter_type = models.CharField(max_length=20, choices=FILTERS, default=FILTERS[0][0])
+    comparator = models.CharField(max_length=20, choices=(('eq', 'equals'), ('neq', 'not equals')), default='eq')
+    value = models.CharField(max_length=100, blank=True, null=True)
+    belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
+
+
+class Group(models.Model):
+    """Group of Filters that will be chained with an 'operator' (AND, OR) to create a Segment."""
+    operator = models.CharField(max_length=3, choices=(('AND', 'all'), ('OR', 'any')), default='AND')
+    filters = models.ManyToManyField("Filter", related_name='groups')
+    belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
+    segment = models.OneToOneField(Segment, on_delete=models.CASCADE, related_name='groups', null=True, blank=True)

@@ -1,6 +1,6 @@
 from django import forms
 
-from contacts.models import Contact, AllowedField, Segment
+from contacts.models import Contact, AllowedField, Segment, Group, Filter
 
 
 class ContactForm(forms.ModelForm):
@@ -47,5 +47,16 @@ class SegmentForm(forms.ModelForm):
         """Override __init__ to declare dynamically the filters."""
         if kwargs.get('request'):
             self.request = kwargs.pop('request')
-        print(vars(self.request))
         super().__init__(*args, **kwargs)
+
+
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        exclude = ['filters', 'belongs_to', 'segment']
+
+
+class FilterForm(forms.ModelForm):
+    class Meta:
+        model = Filter
+        exclude = ['belongs_to']
