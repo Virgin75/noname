@@ -1,4 +1,4 @@
-from users.forms import UserRegisterForm, CompanyForm
+from users.forms import UserRegisterForm, CompanyForm, AuthForm
 from users.models import Account
 from django.views.generic.edit import CreateView, FormView, BaseUpdateView, UpdateView
 from django.contrib.auth.models import AnonymousUser
@@ -26,7 +26,7 @@ class SignUpView(SuccessMessageMixin, CreateView):
 
 class LoginView(FormView):
     template_name = 'users/login.html'
-    form_class = AuthenticationForm
+    form_class = AuthForm
 
     def get(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):

@@ -1,8 +1,17 @@
+{% extends "commons/base_logged_out.html" %}
 {% block content %}
   <h2>Sign up</h2>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% for field in form %}
+            <div class="form-control w-full max-w-xs">
+                <label class="label">
+                    <span class="label-text">{{ field.label_tag }}</span>
+                </label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
     <button type="submit">Sign up</button>
   </form>
     <a href="{% url 'users:login' %}">Log in?</a>

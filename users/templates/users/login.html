@@ -1,9 +1,37 @@
+{% extends "commons/base_logged_out.html" %}
 {% block content %}
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-  </form>
-    <a href="{% url 'users:signup' %}">Sign up</a>
+    <div class="prose max-w-none flex flex-col items-center w-full px-3 py-3 justify-center h-screen">
+    <h1>Login</h1>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-control w-full max-w-xs">
+                <label class="label">
+                    <span class="label-text">{{ field.label_tag }}</span>
+                </label>
+                {{ field }}
+                <label class="label">
+                    <span class="label-text-alt accent-red-500">{{ field.errors }}</span>
+                </label>
+            {% if form.errors %}
+    <ul class="user-msg error">
+    {% for field in form %}
+        {% for error in field.errors %}
+            <li>
+              {% if field != '__all__' %}
+                <strong>{{ field.label }}:</strong>
+              {% endif %}
+              {{ error }}
+            </li>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+{% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+    <a class="btn btn-secondary" href="{% url 'users:signup' %}">Sign up</a>
+    </div>
+
 {% endblock %}

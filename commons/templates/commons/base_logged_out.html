@@ -1,0 +1,17 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html data-theme="default_theme" lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% tailwind_css %}
+    <title>{% block title %}My amazing site{% endblock %}</title>
+</head>
+
+<body class="block">
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

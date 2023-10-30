@@ -1,2 +1,7 @@
-<h1>Successfully logged out.</h1>
-<a href="{% url 'users:login' %}">Log back in.</a>
+{% extends "commons/base_logged_out.html" %}
+{% block content %}
+    <div class="prose max-w-none flex items-center justify-center h-screen flex-col">
+    <h1>Successfully logged out.</h1>
+    <a class="btn btn-primary" href="{% url 'users:login' %}">Log back in.</a>
+    </div>
+{% endblock %}

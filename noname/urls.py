@@ -23,4 +23,5 @@ urlpatterns = [
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('', include(('commons.urls', 'commons'), namespace='commons')),
     path('', include(('contacts.urls', 'contacts'), namespace='contacts')),
+    path("__reload__/", include("django_browser_reload.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.ENV == 'local' else []
