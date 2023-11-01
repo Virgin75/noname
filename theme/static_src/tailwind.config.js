@@ -6,32 +6,23 @@
  */
 
 module.exports = {
-     daisyui: {
-      themes: [
-        {
-          default_theme: {
-
- "primary": "#144f7f",
-
- "secondary": "#fa88fc",
-
- "accent": "#4ed37a",
-
- "neutral": "#372a37",
-
- "base-100": "#f0f0f0",
-
- "info": "#49abd4",
-
- "success": "#19a955",
-
- "warning": "#fab766",
-
- "error": "#df5043",
-          },
-        },
-      ],
-    },
+     theme: {
+         screens: {
+              'mobile': '1px',
+              'desktop': '740px',
+         },
+         extend: {
+            animation: {
+              'fadein-out': 'fadeinout 3s'
+            },
+             keyframes: {
+                 fadeinout: {
+                   '0%, 100%': { opacity: 0 },
+                   '50%': { opacity: 1 },
+                 }
+             }
+          }
+     },
     content: [
         /**
          * HTML. Paths to Django template files that will contain Tailwind CSS classes.
@@ -57,28 +48,15 @@ module.exports = {
          * patterns match your project structure.
          */
         /* JS 1: Ignore any JavaScript in node_modules folder. */
-        // '!../../**/node_modules',
+         '!../../**/node_modules',
         /* JS 2: Process all JavaScript files in the project. */
-        // '../../**/*.js',
+         '../../**/*.js',
 
         /**
          * Python: If you use Tailwind CSS classes in Python, uncomment the following line
          * and make sure the pattern below matches your project structure.
          */
-        // '../../**/*.py'
+        '../../**/*.py'
     ],
-    theme: {
-        extend: {},
-    },
-    plugins: [
-        /**
-         * '@tailwindcss/forms' is the forms plugin that provides a minimal styling
-         * for forms. If you don't like it or have own styling for forms,
-         * comment the line below to disable '@tailwindcss/forms'.
-         */
-        require('@tailwindcss/typography'),
-        require('@tailwindcss/line-clamp'),
-        require('@tailwindcss/aspect-ratio'),
-        require("daisyui"),
-    ],
+    plugins: [require("daisyui")],
 }

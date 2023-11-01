@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django_filters',
     'commons',
     'users',
-    'contacts'
+    'contacts',
+    'django.forms',
 ]
 if os.getenv('env') == 'local':
     INSTALLED_APPS.append('django_browser_reload')
@@ -151,3 +152,4 @@ STATICFILES_DIRS = (
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TAILWIND_APP_NAME = 'theme'
 INTERNAL_IPS = ["127.0.0.1"]
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'

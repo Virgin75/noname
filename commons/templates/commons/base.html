@@ -1,13 +1,13 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html data-theme="default_theme" lang="en">
+<html data-theme="light" lang="en">
 <head>
     <meta charset="UTF-8">
     {% tailwind_css %}
-    <title>{% block title %}My amazing site{% endblock %}</title>
+    <title>{% block title %}Noname{% endblock %}</title>
 </head>
 
-<body>
+<body class="flex flex-row">
     {% url 'contacts:list_contacts' as list_contacts_url %}
     {% url 'contacts:create_contact' as create_contact_url %}
     {% url 'contacts:update_contact' as update_contact_url %}
@@ -20,29 +20,118 @@
     {% url 'contacts:create_segment' as create_segments_url %}
     {% url 'contacts:delete_segment' as delete_segment_url %}
     {% url 'contacts:segment_details' as update_segment_url %}
-    <div class="menu">
+    <div id="menu-desktop" class="flex flex-col gap-6 w-1/4 bg-base-100 h-screen px-7 py-6 shadow-xl">
         {% block sidebar %}
-        <a class="menu-item" href="{% url 'commons:home' %}">Home</a>
-        <a class="menu-item" href="{% url 'contacts:list_contacts' %}">Subscribers</a>
-            {% if request.path == list_contacts_url or request.path == create_contact_url or request.path == list_custom_fields_url or request.path == create_custom_field_url or request.path == update_contact_url or request.path == delete_contact_url or request.path == update_custom_field_url or request.path == delete_custom_field_url or request.path == create_segments_url or request.path == list_segments_url or request.path == delete_segment_url or request.path == update_segment_url%}
-                <a class="sub-menu-item" href="{% url 'contacts:list_custom_fields' %}">-- Custom fields</a>
-                <a class="sub-menu-item" href="{% url 'contacts:list_segments' %}">-- Segments</a>
-            {% endif %}
-        <a class="menu-item bottom" href="{% url 'users:update_company' %}">My company</a>
-        <a class="menu-item" href="{% url 'users:logout' %}">Log out</a>
+        <h1 class="heading-1">NoName</h1>
+        <div class="flex rounded-box gap-4 bg-base-200 p-5">
+
+            <div class="avatar online placeholder">
+                  <div class="bg-neutral-focus text-neutral-content rounded-full w-12">
+                    <span class="text-base">VB</span>
+                  </div>
+            </div>
+            <div class="flex flex-col w-8/12 mr-auto">
+                <span class="text-base truncate">Virgin Bitton</span>
+                <span class="text-base truncate">virgin.bitton@gmail.com</span>
+            </div>
+            <div class="flex justify-end w-1/12">
+                <div class="flex items-center dropdown dropdown-hover">
+                  <label tabindex="0"><svg class="w-7" viewBox="0 0 445 422" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M264.219 342.875C264.219 353.368 259.823 363.431 252 370.85C244.176 378.269 233.565 382.437 222.5 382.438C211.435 382.437 200.824 378.269 193 370.85C185.177 363.431 180.781 353.368 180.781 342.875C180.781 332.382 185.177 322.319 193 314.9C200.824 307.481 211.435 303.313 222.5 303.312C233.565 303.313 244.176 307.481 252 314.9C259.823 322.319 264.219 332.382 264.219 342.875ZM264.219 211C264.219 221.493 259.823 231.556 252 238.975C244.176 246.394 233.565 250.562 222.5 250.562C211.435 250.562 200.824 246.394 193 238.975C185.177 231.556 180.781 221.493 180.781 211C180.781 200.507 185.177 190.444 193 183.025C200.824 175.606 211.435 171.438 222.5 171.438C233.565 171.438 244.176 175.606 252 183.025C259.823 190.444 264.219 200.507 264.219 211ZM264.219 79.125C264.219 89.6176 259.823 99.6805 252 107.1C244.176 114.519 233.565 118.688 222.5 118.688C211.435 118.688 200.824 114.519 193 107.1C185.177 99.6805 180.781 89.6176 180.781 79.125C180.781 68.6324 185.177 58.5695 193 51.1501C200.824 43.7307 211.435 39.5625 222.5 39.5625C233.565 39.5625 244.176 43.7307 252 51.1501C259.823 58.5695 264.219 68.6324 264.219 79.125Z" fill="black"/>
+</svg></label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a>Profile settings</a></li>
+                    <li><a>Company settings</a></li>
+                  </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <ul class="menu bg-base-100 lg:menu-horizontal rounded-box">
+          <li>
+            <a class="bg-primary dark:text-white light:text-base100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              <span class="text-xl">Dashboard</span>
+              <span class="badge badge-sm">99+</span>
+            </a>
+          </li>
+
+          <li>
+            <details open>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Subscribers</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Your subscribers</a></li>
+                  <li><a class="text-lg">Segments</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Pages</span>
+                    <span class="badge badge-sm badge-warning">NEW</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Subscribers' list</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Products</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Your subscribers</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Email</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Subscribers' list</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+        </ul>
+        <div class="divider mt-auto" style="margin-bottom: -20px"></div>
+            <ul class="menu">
+                  <li>
+                    <a>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                      <span class="text-base">Log out</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span class="text-base">Settings</span>
+                    </a>
+                  </li>
+                </ul>
+            <div class="flex flex-col items-end">
+                <span class="text-base italic">Version 0.6.1</span>
+            </div>
         {% endblock %}
     </div>
 
-    <div class="content">
-        {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-        {% endif %}
-        {% block content %}
-        {% endblock %}
-    </div>
 </body>
 </html>

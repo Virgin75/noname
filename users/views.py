@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib.auth import login
 from django.contrib.auth import logout
+from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,6 +34,11 @@ class LoginView(FormView):
             return super().get(request, *args, **kwargs)
         return redirect(reverse_lazy('commons:home'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['messages'] = messages.get_messages(self.request)
+        return context
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -40,6 +46,8 @@ class LoginView(FormView):
             login(request, user)
             return self.form_valid(form)
         else:
+            print("in else")
+            messages.error(request, "error")
             return self.form_invalid(form)
 
     def get_success_url(self):

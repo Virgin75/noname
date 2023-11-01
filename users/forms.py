@@ -5,13 +5,11 @@ from django.contrib.auth import login
 
 
 class AuthForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'input input-bordered input-primary w-full max-w-xs'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input input-bordered input-primary w-full max-w-xs'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'input input-bordered input-primary w-full'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input input-bordered input-primary w-full'}))
 
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'input input-bordered input-primary w-full max-w-xs'}))
-
     class Meta:
         model = Account
         fields = ['email', 'first_name', 'last_name']
