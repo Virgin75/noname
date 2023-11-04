@@ -26,6 +26,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    @property
+    def initials(self) -> str | None:
+        """Returns the initials of the user (capitalized)."""
+        return f"{self.first_name[0]}{self.last_name[0]}".upper() if self.first_name and self.last_name else None
+
     def __str__(self):
         return self.email
 

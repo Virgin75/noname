@@ -1,0 +1,122 @@
+{% url 'contacts:list_contacts' as list_contacts_url %}
+{% url 'contacts:create_contact' as create_contact_url %}
+{% url 'contacts:update_contact' as update_contact_url %}
+{% url 'contacts:delete_contact' as delete_contact_url %}
+{% url 'contacts:list_custom_fields' as list_custom_fields_url %}
+{% url 'contacts:create_custom_field' as create_custom_field_url %}
+{% url 'contacts:update_custom_field' as update_custom_field_url %}
+{% url 'contacts:delete_custom_field' as delete_custom_field_url %}
+{% url 'contacts:list_segments' as list_segments_url %}
+{% url 'contacts:create_segment' as create_segments_url %}
+{% url 'contacts:delete_segment' as delete_segment_url %}
+{% url 'contacts:segment_details' as update_segment_url %}
+<h1 class="heading-1">NoName</h1>
+<div class="flex rounded-box gap-4 bg-base-200 p-5">
+
+            <div class="avatar online placeholder">
+                  <div class="bg-neutral-focus text-neutral-content rounded-full w-12">
+                    <span class="text-base">{{ user.initials }}</span>
+                  </div>
+            </div>
+            <div class="flex flex-col w-8/12 mr-auto">
+                <span class="text-base truncate">{{ user.first_name|title }} {{ user.last_name|title }}</span>
+                <span class="text-base truncate">{{ user.email }}</span>
+            </div>
+            <div class="flex justify-end w-1/12">
+                <div class="flex items-center dropdown dropdown-hover dropdown-end dropdown-bottom">
+                  <label tabindex="0"><svg class="w-7 fill-secondary" viewBox="0 0 445 422" xmlns="http://www.w3.org/2000/svg">
+<path d="M264.219 342.875C264.219 353.368 259.823 363.431 252 370.85C244.176 378.269 233.565 382.437 222.5 382.438C211.435 382.437 200.824 378.269 193 370.85C185.177 363.431 180.781 353.368 180.781 342.875C180.781 332.382 185.177 322.319 193 314.9C200.824 307.481 211.435 303.313 222.5 303.312C233.565 303.313 244.176 307.481 252 314.9C259.823 322.319 264.219 332.382 264.219 342.875ZM264.219 211C264.219 221.493 259.823 231.556 252 238.975C244.176 246.394 233.565 250.562 222.5 250.562C211.435 250.562 200.824 246.394 193 238.975C185.177 231.556 180.781 221.493 180.781 211C180.781 200.507 185.177 190.444 193 183.025C200.824 175.606 211.435 171.438 222.5 171.438C233.565 171.438 244.176 175.606 252 183.025C259.823 190.444 264.219 200.507 264.219 211ZM264.219 79.125C264.219 89.6176 259.823 99.6805 252 107.1C244.176 114.519 233.565 118.688 222.5 118.688C211.435 118.688 200.824 114.519 193 107.1C185.177 99.6805 180.781 89.6176 180.781 79.125C180.781 68.6324 185.177 58.5695 193 51.1501C200.824 43.7307 211.435 39.5625 222.5 39.5625C233.565 39.5625 244.176 43.7307 252 51.1501C259.823 58.5695 264.219 68.6324 264.219 79.125Z"/>
+</svg></label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a>Profile settings</a></li>
+                    <li><a>Company settings</a></li>
+                  </ul>
+                </div>
+
+            </div>
+
+        </div>
+<ul class="menu bg-base-100 lg:menu-horizontal rounded-box">
+          <li>
+            <a class="bg-primary dark:text-white light:text-base100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              <span class="text-xl">Dashboard</span>
+              <span class="badge badge-sm">99+</span>
+            </a>
+          </li>
+
+          <li>
+            <details open>
+                <summary>
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.59615 18.6154V16.9692C2.59615 16.5051 2.71634 16.1061 2.95673 15.7721C3.19711 15.4382 3.52015 15.1712 3.92585 14.9714C4.79324 14.5584 5.65449 14.2292 6.5096 13.9837C7.36474 13.7381 8.39359 13.6154 9.59615 13.6154C10.7987 13.6154 11.8276 13.7381 12.6827 13.9837C13.5378 14.2292 14.3991 14.5584 15.2665 14.9714C15.6722 15.1712 15.9952 15.4382 16.2356 15.7721C16.476 16.1061 16.5962 16.5051 16.5962 16.9692V18.6154H2.59615ZM18.5962 18.6154V16.9231C18.5962 16.3436 18.4789 15.7966 18.2443 15.2821C18.0097 14.7676 17.677 14.3261 17.2462 13.9577C17.7372 14.0577 18.2103 14.1965 18.6654 14.374C19.1205 14.5516 19.5705 14.7513 20.0154 14.9731C20.4487 15.191 20.7885 15.4699 21.0346 15.8098C21.2808 16.1497 21.4039 16.5208 21.4039 16.9231V18.6154H18.5962ZM9.59615 11.3846C8.77115 11.3846 8.0649 11.0909 7.4774 10.5034C6.8899 9.91589 6.59615 9.20964 6.59615 8.38464C6.59615 7.55962 6.8899 6.85336 7.4774 6.26586C8.0649 5.67836 8.77115 5.38461 9.59615 5.38461C10.4212 5.38461 11.1274 5.67836 11.7149 6.26586C12.3024 6.85336 12.5962 7.55962 12.5962 8.38464C12.5962 9.20964 12.3024 9.91589 11.7149 10.5034C11.1274 11.0909 10.4212 11.3846 9.59615 11.3846ZM16.8654 8.38464C16.8654 9.20964 16.5717 9.91589 15.9842 10.5034C15.3967 11.0909 14.6904 11.3846 13.8654 11.3846C13.8231 11.3846 13.7692 11.3798 13.7039 11.3702C13.6385 11.3606 13.5846 11.35 13.5423 11.3385C13.8811 10.9236 14.1414 10.4633 14.3233 9.95761C14.5052 9.45195 14.5962 8.92682 14.5962 8.38224C14.5962 7.83767 14.501 7.31731 14.3106 6.82116C14.1202 6.32501 13.8641 5.86155 13.5423 5.43076C13.5962 5.41155 13.65 5.39905 13.7039 5.39326C13.7577 5.3875 13.8116 5.38461 13.8654 5.38461C14.6904 5.38461 15.3967 5.67836 15.9842 6.26586C16.5717 6.85336 16.8654 7.55962 16.8654 8.38464ZM3.59615 17.6154H15.5962V16.9692C15.5962 16.7346 15.5375 16.5295 15.4202 16.3539C15.3029 16.1782 15.0923 16.0103 14.7885 15.85C14.0423 15.4513 13.2558 15.1458 12.4289 14.9337C11.6019 14.7215 10.6577 14.6154 9.59615 14.6154C8.53462 14.6154 7.59039 14.7215 6.76345 14.9337C5.93654 15.1458 5.15 15.4513 4.40385 15.85C4.1 16.0103 3.88942 16.1782 3.7721 16.3539C3.6548 16.5295 3.59615 16.7346 3.59615 16.9692V17.6154ZM9.59615 10.3846C10.1462 10.3846 10.617 10.1888 11.0087 9.79714C11.4003 9.40547 11.5962 8.93464 11.5962 8.38464C11.5962 7.83464 11.4003 7.36381 11.0087 6.97214C10.617 6.58047 10.1462 6.38464 9.59615 6.38464C9.04615 6.38464 8.57532 6.58047 8.18365 6.97214C7.79199 7.36381 7.59615 7.83464 7.59615 8.38464C7.59615 8.93464 7.79199 9.40547 8.18365 9.79714C8.57532 10.1888 9.04615 10.3846 9.59615 10.3846Z"/>
+</svg>
+                    <span class="text-xl">Subscribers</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg" href="{{ list_contacts_url }}">Your subscribers</a></li>
+                  <li><a class="text-lg" href="{{  list_segments_url }}">Segments</a></li>
+                  <li><a class="text-lg" href="{{ list_custom_fields_url }}">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Pages</span>
+                    <span class="badge badge-sm badge-warning">NEW</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Subscribers' list</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Products</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Your subscribers</a></li>
+                  <li><a class="text-lg">Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+
+        <li>
+            <details>
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="text-xl">Email</span>
+                </summary>
+                <ul>
+                  <li><a class="text-lg">Subscribers' list</a></li>
+                  <li><a class="text-lg" >Custom fields</a></li>
+                </ul>
+          </details>
+          </li>
+        </ul>
+<div class="divider mt-auto" style="margin-bottom: -20px"></div>
+<ul class="menu">
+                  <li>
+                    <a href="{% url "users:logout" %}">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                      <span class="text-base">Log out</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span class="text-base">Settings</span>
+                    </a>
+                  </li>
+                </ul>
+<div class="flex flex-col items-end" style="margin-top: -20px;">
+    {% load get_app_version %}
+   <span class="text-base italic">Version {{ get_app_version }}</span>
+</div>
