@@ -8,6 +8,9 @@
 </head>
 
 <body class="flex flex-row">
+    <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
+
+    <div id="alerts"></div>
     <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 min-w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
         {% include 'commons/menu.html' %}
     </div>
@@ -27,6 +30,10 @@
         {% block content %}
         {% endblock %}
     </div>
-
+<script>
+      document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      })
+</script>
 </body>
 </html>

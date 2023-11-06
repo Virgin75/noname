@@ -3,7 +3,7 @@
 {% block title %}Create a new dynamic segment{% endblock %}
 
 {% block content %}
-    <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
+
     <h1>Create a new dynamic segment</h1>
     <form method="post">{% csrf_token %}
         {{ form.as_p }}

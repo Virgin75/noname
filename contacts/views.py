@@ -1,17 +1,21 @@
 import datetime
 
 from django.urls import reverse_lazy
+from django.template import Template
 
 from commons.views import OrderingMixin
 from contacts.forms import ContactForm, CustomFieldForm, SegmentForm, GroupForm, FilterForm
 from contacts.models import Contact, AllowedField, Segment, Group, Filter
 from django.views.generic.edit import CreateView, FormView, BaseUpdateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.fields.json import KT
+from django.template.loader import get_template
+
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.response import TemplateResponse
+from django.template import Context
 from contacts.filters import ContactFilter, CustomFieldFilter, SegmentFilter
 
 
@@ -117,19 +121,29 @@ class ListCustomField(SuccessMessageMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class CreateCustomField(SuccessMessageMixin, LoginRequiredMixin, FormView):
+class CreateCustomField(LoginRequiredMixin, FormView):
     """View used to create a new custom field."""
     template_name = 'contacts/create_custom_field.html'
     form_class = CustomFieldForm
-    success_url = reverse_lazy('contacts:list_custom_fields')
-    success_message = 'Field created successfully.'
 
-    def form_valid(self, form):
-        """Override 'form_valid()' to update 'belongs_to' field."""
-        contact = form.save(commit=False)
-        contact.belongs_to = self.request.user.company
-        contact.save()
-        return super().form_valid(form)
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        """Override 'get()' to display the modal with htmx."""
+        return TemplateResponse(request, self.template_name, {'form': self.form_class()})
+
+    def form_valid(self, form) -> HttpResponse:
+        """Override 'form_valid()' to update 'belongs_to' field and return a single line to add to table."""
+        existing_fields = AllowedField.objects.filter(belongs_to=self.request.user.company).exists()
+        field = form.save(commit=False)
+        field.belongs_to = self.request.user.company
+        field.save()
+        if existing_fields:
+            template = get_template('contacts/custom_field_table_line.html')
+            alert_template = get_template('commons/alert_success.html')
+            return HttpResponse(
+               template.render({'id': field.id, 'name': field.name, 'type': field.type}) + '\n' +
+               alert_template.render({'message': 'Field created successfully.'})
+            )
+        return HttpResponse(headers={"HX-Redirect": reverse_lazy('contacts:list_custom_fields')})
 
 
 class DeleteCustomField(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
