@@ -3766,6 +3766,10 @@ details.collapse summary::-webkit-details-marker {
   position: sticky;
 }
 
+.bottom-10 {
+  bottom: 2.5rem;
+}
+
 .bottom-8 {
   bottom: 2rem;
 }
@@ -3782,8 +3786,12 @@ details.collapse summary::-webkit-details-marker {
   top: 2.5rem;
 }
 
-.bottom-10 {
-  bottom: 2.5rem;
+.bottom-20 {
+  bottom: 5rem;
+}
+
+.bottom-12 {
+  bottom: 3rem;
 }
 
 .isolate {
@@ -3815,16 +3823,12 @@ details.collapse summary::-webkit-details-marker {
   margin-top: 0.5rem;
 }
 
-.mt-auto {
-  margin-top: auto;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
-}
-
 .mt-5 {
   margin-top: 1.25rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .block {
@@ -3971,10 +3975,6 @@ details.collapse summary::-webkit-details-marker {
   width: 100%;
 }
 
-.w-1\/2 {
-  width: 50%;
-}
-
 .min-w-\[21\%\] {
   min-width: 21%;
 }
@@ -4017,6 +4017,20 @@ details.collapse summary::-webkit-details-marker {
 
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@keyframes fadeinout {
+  0%, 100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fadein-out {
+  animation: fadeinout 4s;
 }
 
 @keyframes ping {

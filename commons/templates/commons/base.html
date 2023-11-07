@@ -10,7 +10,6 @@
 <body class="flex flex-row">
     <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
 
-    <div id="alerts"></div>
     <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 min-w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
         {% include 'commons/menu.html' %}
     </div>
@@ -26,14 +25,23 @@
         </dialog>
     </div>
 
-    <div id="page-content" class="py-10 px-12 bg-base-200 flex-grow min-h-screen">
+    <div id="page-content" class="py-10 px-12 bg-base-200 flex-grow">
         {% block content %}
         {% endblock %}
+        {% include 'commons/alert_success.html' %}
     </div>
-<script>
+<script type="text/javascript">
       document.body.addEventListener('htmx:configRequest', (event) => {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      })
+      });
+      document.body.addEventListener('htmx:configRequest', function(event) {
+          if (event.detail.verb === "post" && (event.detail.path.includes("/add") || event.detail.path.includes("/create"))) {
+            var alerts = document.getElementById("alerts");
+            alerts.classList.remove("hidden");
+            setTimeout(function(){ alerts.classList.add("hidden"); }, 4000);
+          }
+      });
+
 </script>
 </body>
 </html>

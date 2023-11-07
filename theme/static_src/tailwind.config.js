@@ -13,7 +13,7 @@ module.exports = {
          },
          extend: {
             animation: {
-              'fadein-out': 'fadeinout 3s'
+              'fadein-out': 'fadeinout 4s'
             },
              keyframes: {
                  fadeinout: {

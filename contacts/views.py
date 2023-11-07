@@ -138,10 +138,8 @@ class CreateCustomField(LoginRequiredMixin, FormView):
         field.save()
         if existing_fields:
             template = get_template('contacts/custom_field_table_line.html')
-            alert_template = get_template('commons/alert_success.html')
             return HttpResponse(
-               template.render({'id': field.id, 'name': field.name, 'type': field.type}) + '\n' +
-               alert_template.render({'message': 'Field created successfully.'})
+               template.render({'id': field.id, 'name': field.name, 'type': field.type})
             )
         return HttpResponse(headers={"HX-Redirect": reverse_lazy('contacts:list_custom_fields')})
 
