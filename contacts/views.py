@@ -11,6 +11,7 @@ from django.views.generic.list import ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.fields.json import KT
 from django.template.loader import get_template
+from django.contrib import messages
 
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -108,6 +109,7 @@ class DeleteContact(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
 
 class ListCustomField(SuccessMessageMixin, LoginRequiredMixin, ListView):
     template_name = 'contacts/list_custom_fields.html'
+    paginate_by = 10
 
     def get_queryset(self):
         """Filter Custom fields with the user's Company."""
@@ -118,35 +120,32 @@ class ListCustomField(SuccessMessageMixin, LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['fields'] = ['id', 'Field name', 'Field type']
         context['filter'] = CustomFieldFilter(self.request.GET, queryset=self.get_queryset())
+        context['create_form'] = CustomFieldForm()
+        context['total_fields'] = self.get_queryset().count()
         return context
 
 
-class CreateCustomField(LoginRequiredMixin, FormView):
+class CreateCustomField(LoginRequiredMixin, FormView, SuccessMessageMixin):
     """View used to create a new custom field."""
-    template_name = 'contacts/create_custom_field.html'
     form_class = CustomFieldForm
-
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        """Override 'get()' to display the modal with htmx."""
-        return TemplateResponse(request, self.template_name, {'form': self.form_class()})
+    success_message = 'Field created successfully.'
 
     def form_valid(self, form) -> HttpResponse:
         """Override 'form_valid()' to update 'belongs_to' field and return a single line to add to table."""
-        existing_fields = AllowedField.objects.filter(belongs_to=self.request.user.company).exists()
         field = form.save(commit=False)
         field.belongs_to = self.request.user.company
         field.save()
-        if existing_fields:
-            template = get_template('contacts/custom_field_table_line.html')
-            return HttpResponse(
-               template.render({'id': field.id, 'name': field.name, 'type': field.type})
-            )
-        return HttpResponse(headers={"HX-Redirect": reverse_lazy('contacts:list_custom_fields')})
+        messages.success(self.request, self.success_message)
+        return HttpResponseRedirect(reverse_lazy('contacts:list_custom_fields'))
+
+    def form_invalid(self, form):
+        """Override 'form_invalid()' to return the form with errors."""
+        messages.error(self.request, 'Error creating field.')
+        return HttpResponseRedirect(reverse_lazy('contacts:list_custom_fields'))
 
 
 class DeleteCustomField(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     """View used to delete a custom field."""
-    template_name = 'contacts/delete_custom_field.html'
     model = AllowedField
     success_url = reverse_lazy('contacts:list_custom_fields')
     success_message = 'Field deleted successfully.'

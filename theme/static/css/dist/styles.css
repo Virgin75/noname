@@ -2456,6 +2456,10 @@ details.collapse summary::-webkit-details-marker {
   margin-left: -1px;
 }
 
+.join-item:focus {
+  isolation: isolate;
+}
+
 .link:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -2656,6 +2660,16 @@ details.collapse summary::-webkit-details-marker {
   .modal::backdrop {
   background-color: rgba(0, 0, 0, 0.3);
   animation: modal-pop 0.2s ease-out;
+}
+
+.modal-backdrop {
+  z-index: -1;
+  grid-column-start: 1;
+  grid-row-start: 1;
+  display: grid;
+  align-self: stretch;
+  justify-self: stretch;
+  color: transparent;
 }
 
 .modal-open .modal-box,
@@ -3766,8 +3780,8 @@ details.collapse summary::-webkit-details-marker {
   position: sticky;
 }
 
-.bottom-10 {
-  bottom: 2.5rem;
+.bottom-12 {
+  bottom: 3rem;
 }
 
 .bottom-8 {
@@ -3784,14 +3798,6 @@ details.collapse summary::-webkit-details-marker {
 
 .top-10 {
   top: 2.5rem;
-}
-
-.bottom-20 {
-  bottom: 5rem;
-}
-
-.bottom-12 {
-  bottom: 3rem;
 }
 
 .isolate {
@@ -3929,10 +3935,6 @@ details.collapse summary::-webkit-details-marker {
 
 .min-h-full {
   min-height: 100%;
-}
-
-.min-h-screen {
-  min-height: 100vh;
 }
 
 .w-1\/12 {
@@ -4166,6 +4168,11 @@ details.collapse summary::-webkit-details-marker {
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
+}
+
+.bg-secondary {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
 }
 
 .fill-secondary {
