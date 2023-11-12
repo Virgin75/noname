@@ -2,7 +2,7 @@
 {% block title %}Custom fields{% endblock %}
 {% block content %}
     {% include "contacts/create_custom_field.html" %}
-    <div id="page-content" class="flex flex-col gap-5 min-h-full">
+    <div id="page-content" class="flex flex-col gap-5">
         <div class="flex flex-wrap gap-5">
             <h1 class="heading-1">Custom fields</h1>
             <button class="btn btn-primary ml-auto" onclick="create_modal.showModal()">
@@ -33,6 +33,7 @@
             <div class="stat-desc">created</div>
           </div>
         </div>
+            {% include "commons/filters.html" %}
             <div class="flex bg-base-100 flex-grow rounded-2xl">
             <div class="overflow-x-auto w-full rounded-2xl">
               <table class="table table-zebra table-pin-rows table-pin-cols">
