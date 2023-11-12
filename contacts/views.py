@@ -123,9 +123,15 @@ class ListCustomField(SuccessMessageMixin, LoginRequiredMixin, ListView):
         filterset = CustomFieldFilter(self.request.GET, queryset=self.get_queryset())
         page = self.request.GET.get('page', 1)
         context['paginated_objects'] = self.get_paginator(filterset.qs, self.paginate_by).get_page(page)
+        _, page_obj, _, _ = self.paginate_queryset(filterset.qs, self.paginate_by)
+        context["page_obj"] = page_obj
         context['create_form'] = CustomFieldForm()
         context['total_fields'] = self.get_queryset().count()
+        context["filter"] = filterset
+        context["active_filters"] = len({k: v for k, v in self.request.GET.items() if k not in ('page', 'order_by', 'name')})
+        filterset.form.active_filters = context["active_filters"]
         return context
+
 
 
 class CreateCustomField(LoginRequiredMixin, FormView, SuccessMessageMixin):
