@@ -11,7 +11,7 @@
             </button>
         </div>
         <p class="text max-w-3xl mb-2">Custom fields help you define the traits of your subscribers. The only default field is the <i>"email" </i> field. If you want any additional field such as <i>"age"</i> or <i>"register_date"</i>, you must create them on this page.</p>
-        {% if not filter.qs %}
+        {% if not paginated_objects %}
             <div class="flex justify-center items-center flex-grow">
                 <div class="flex flex-col gap-5 bg-base-200 rounded-2xl border-dashed border-base-300 border-4 p-16 justify-center items-center">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,21 +46,14 @@
                   </tr>
                 </thead>
                 <tbody id="table-body">
-                {% for field in filter.qs %}
+                {% for field in paginated_objects %}
                     {% include "contacts/custom_field_table_line.html" with id=field.id name=field.name type=field.type %}
                 {% endfor %}
                 </tbody>
               </table>
             </div>
         </div>
-            <div class="join">
-              <button class="join-item btn bg-secondary">1</button>
-              <button class="join-item btn">2</button>
-              <button class="join-item btn">3</button>
-              <button class="join-item btn btn-disabled">...</button>
-              <button class="join-item btn">99</button>
-              <button class="join-item btn">100</button>
-            </div>
+            {% include "commons/pagination.html" %}
         {% endif %}
     </div>
 {% endblock %}

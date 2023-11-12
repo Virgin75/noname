@@ -1,17 +1,26 @@
-<div class="pagination">
-    <span class="step-links">
+<div class="flex justify-center items-center">
+    <div class="join">
+        {% if page_obj.number == 3 %}
+            <a href="?page=1" class="join-item btn bg-base-100">1</a>
+        {% endif %}
+        {% if page_obj.number > 3 %}
+            <a href="?page=1" class="join-item btn bg-base-100">1</a>
+            <button class="join-item btn btn-disabled">...</button>
+        {% endif %}
         {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="join-item btn bg-base-100">{{ page_obj.previous_page_number }}</a>
         {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
+        {% if page_obj.paginator.num_pages == 1 %}
+            <a href="?page={{ page_obj.number }}" class="join-item btn bg-secondary rounded-2xl">{{ page_obj.number }}</a>
+        {% else %}
+            <a href="?page={{ page_obj.number }}" class="join-item btn bg-secondary">{{ page_obj.number }}</a>
+        {% endif %}
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            <a href="?page={{ page_obj.next_page_number }}" class="join-item btn bg-base-100">{{ page_obj.next_page_number }}</a>
         {% endif %}
-    </span>
+        {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
+            <button class="join-item btn btn-disabled">...</button>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn bg-base-100">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    </div>
 </div>

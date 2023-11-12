@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView, FormView, BaseUpdateView, Upda
 from django.views.generic.list import ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.fields.json import KT
+from django.core.paginator import Paginator
 from django.template.loader import get_template
 from django.contrib import messages
 
@@ -119,7 +120,9 @@ class ListCustomField(SuccessMessageMixin, LoginRequiredMixin, ListView):
         """Pass extra data to the template: fields names and filtered queryset."""
         context = super().get_context_data(**kwargs)
         context['fields'] = ['id', 'Field name', 'Field type']
-        context['filter'] = CustomFieldFilter(self.request.GET, queryset=self.get_queryset())
+        filterset = CustomFieldFilter(self.request.GET, queryset=self.get_queryset())
+        page = self.request.GET.get('page', 1)
+        context['paginated_objects'] = self.get_paginator(filterset.qs, self.paginate_by).get_page(page)
         context['create_form'] = CustomFieldForm()
         context['total_fields'] = self.get_queryset().count()
         return context
