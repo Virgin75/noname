@@ -1,26 +1,28 @@
+{% load my_tags %}
+
 <div class="flex justify-center items-center">
     <div class="join">
         {% if page_obj.number == 3 %}
-            <a href="?page=1" class="join-item btn bg-base-100">1</a>
+            <a href="?{% param_replace page=1 %}" class="join-item btn bg-base-100">1</a>
         {% endif %}
         {% if page_obj.number > 3 %}
-            <a href="?page=1" class="join-item btn bg-base-100">1</a>
+            <a href="?{% param_replace page=1 %}" class="join-item btn bg-base-100">1</a>
             <button class="join-item btn btn-disabled">...</button>
         {% endif %}
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="join-item btn bg-base-100">{{ page_obj.previous_page_number }}</a>
+            <a href="?{% param_replace page=page_obj.previous_page_number %}" class="join-item btn bg-base-100">{{ page_obj.previous_page_number }}</a>
         {% endif %}
         {% if page_obj.paginator.num_pages == 1 %}
-            <a href="?page={{ page_obj.number }}" class="join-item btn bg-secondary rounded-2xl">{{ page_obj.number }}</a>
+            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-secondary rounded-2xl">{{ page_obj.number }}</a>
         {% else %}
-            <a href="?page={{ page_obj.number }}" class="join-item btn bg-secondary">{{ page_obj.number }}</a>
+            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-secondary">{{ page_obj.number }}</a>
         {% endif %}
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="join-item btn bg-base-100">{{ page_obj.next_page_number }}</a>
+            <a href="?{% param_replace page=page_obj.next_page_number %}" class="join-item btn bg-base-100">{{ page_obj.next_page_number }}</a>
         {% endif %}
         {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
             <button class="join-item btn btn-disabled">...</button>
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn bg-base-100">{{ page_obj.paginator.num_pages }}</a>
+            <a href="?{% param_replace page=page_obj.paginator.num_pages %}" class="join-item btn bg-base-100">{{ page_obj.paginator.num_pages }}</a>
         {% endif %}
     </div>
 </div>

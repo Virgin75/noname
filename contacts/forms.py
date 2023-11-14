@@ -39,6 +39,7 @@ class CustomFieldForm(forms.ModelForm):
         """Override as_p to add the form."""
         return self.as_table()
 
+
     def _bound_items(self):
         """Yield (name, bf) pairs, where bf is a BoundField object."""
         for name, value in self.fields.items():

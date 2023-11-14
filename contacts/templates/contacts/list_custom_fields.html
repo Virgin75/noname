@@ -11,7 +11,7 @@
             </button>
         </div>
         <p class="text max-w-3xl mb-2">Custom fields help you define the traits of your subscribers. The only default field is the <i>"email" </i> field. If you want any additional field such as <i>"age"</i> or <i>"register_date"</i>, you must create them on this page.</p>
-        {% if not paginated_objects %}
+        {% if not paginated_objects and not existing_obj %}
             <div class="flex justify-center items-center flex-grow">
                 <div class="flex flex-col gap-5 bg-base-200 rounded-2xl border-dashed border-base-300 border-4 p-16 justify-center items-center">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,15 +24,17 @@
                     </button>
                 </div>
             </div>
-
         {% else %}
-            <div class="stats shadow w-[200px]">
-          <div class="stat">
-            <div class="stat-title">Total custom fields</div>
-            <div class="stat-value">{{ total_fields }}</div>
-            <div class="stat-desc">created</div>
+        <div id="metrics" class="flex">
+          <div class="stats shadow {% if has_any_filters %} border-2 rounded-2xl border-accent/30{% endif %}">
+              <div class="stat">
+                <div class="stat-title">{% if has_any_filters %}Filtered{% else %}Total{% endif %} custom fields</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_total_fields }}</div>
+                <div class="stat-desc">{% if has_any_filters %}matching filters{% else %}created{% endif %}</div>
+              </div>
           </div>
         </div>
+
             {% include "commons/filters.html" %}
             <div class="flex bg-base-100 flex-grow rounded-2xl">
             <div class="overflow-x-auto w-full rounded-2xl">

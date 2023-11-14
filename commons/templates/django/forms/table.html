@@ -7,7 +7,7 @@
                 {% endif %}
                 {% if field.group == "filters" %}
                     <div class="indicator">
-        <span class="indicator-item badge badge-secondary">{{ form.active_filters }}</span>
+        <span class="indicator-item badge bg-accent/50 {% if not form.active_filters %}hidden{% endif %}">{{ form.active_filters }}</span>
         <button type="reset" class="btn join-item bg-base-300" onclick="filters_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z" fill="currentColor"/>
 </svg>
@@ -16,7 +16,7 @@ Filters</button>
                 {% endif %}
                 {% if field.group == "sort" %}
                     <div class="indicator">
-            <span class="indicator-item badge badge-secondary"></span>
+            <span class="indicator-item badge bg-accent/50"></span>
             <button type="reset" class="btn join-item bg-base-300"  onclick="sort_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8 13V5.825L5.425 8.4L4 7L9 2L14 7L12.575 8.4L10 5.825V13H8ZM15 22L10 17L11.425 15.6L14 18.175V11H16V18.175L18.575 15.6L20 17L15 22Z" fill="currentColor"/>
 </svg>Order by</button>
@@ -28,14 +28,19 @@ Filters</button>
 
 <dialog id="filters_modal" class="modal">
   <div class="modal-box">
-    <h3 class="font-bold text-lg">Hello!</h3>
-    <p class="py-4">Press ESC key or click the button below to close</p>
-      <div class="modal-action">
+  <svg class="w-12 h-12 fill-accent" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z"/></svg>
+    <h3 class="font-bold text-lg">Filters</h3>
+    <p class="py-4">Choose your filters and click the "Validate" button.</p>
+      <div class="modal-action flex flex-col gap-5">
           {% for field, errors in fields %}
           {% if field.group == "filters" %}
             {{ field }}
           {% endif %}
           {% endfor %}
+      <div class="flex flex-row justify-end gap-3">
+          <button type="reset" class="btn" onclick="filters_modal.close()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Validate</button>
+      </div>
       </div>
   </div>
 </dialog>

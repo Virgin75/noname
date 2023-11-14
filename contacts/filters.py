@@ -1,8 +1,8 @@
 from django_filters import FilterSet, CharFilter, MultipleChoiceFilter, OrderingFilter, ChoiceFilter
 
+from commons.fields import SearchInput
 from contacts.forms import CustomFieldForm
 from contacts.models import Contact, AllowedField, Segment
-from django.forms import CheckboxSelectMultiple
 
 
 class ContactFilter(FilterSet):
@@ -12,7 +12,7 @@ class ContactFilter(FilterSet):
 
 
 class CustomFieldFilter(FilterSet):
-    name = CharFilter(lookup_expr='icontains')
+    name = CharFilter(lookup_expr='icontains', widget=SearchInput(attrs={'placeholder': 'Search...'}))
     name.field.group = "search"
     type = ChoiceFilter(choices=AllowedField.ALLOWED_TYPES, lookup_expr='exact')
     type.field.group = "filters"
