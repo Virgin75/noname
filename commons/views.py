@@ -6,15 +6,22 @@ class HomeView(TemplateView, LoginRequiredMixin):
     template_name = 'commons/home.html'
 
 
-class OrderingMixin:
-    ordering_fields = []
-    ordering_type = "desc"  # asc or desc
+class FilterMixin:
+    filterset_class = None
 
-    def get_ordering(self):
-        ordering = self.request.GET.get('ordering', "id")
-        ordering = ordering if self.ordering_type == "asc" else f"-{ordering}"
-        return ordering
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        return context | {'ordering_fields': self.ordering_fields}
+        extra_context = {}
+        filterset = self.filterset_class(self.request.GET, queryset=self.get_queryset(), request=self.request)
+        page = self.request.GET.get('page', 1)
+        extra_context['paginated_objects'] = self.get_paginator(filterset.qs, self.paginate_by).get_page(page)
+        _, page_obj, _, _ = self.paginate_queryset(filterset.qs, self.paginate_by)
+        extra_context["page_obj"] = page_obj
+        context["existing_obj"] = True if self.get_queryset().first() else False
+        context["filter"] = filterset
+        context["active_filters"] = len({k: v for k, v in self.request.GET.items() if
+                                         k not in ('page', 'order_by', 'name') and v not in ('', None)})
+        context["has_any_filters"] = True if {k: v for k, v in self.request.GET.items() if
+                                              k not in ('order_by', 'page') and v not in ('', None)} else False
+        filterset.form.active_filters = context["active_filters"]
+        return context | extra_context

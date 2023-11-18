@@ -3,6 +3,12 @@ from django import template
 register = template.Library()
 
 
+@register.simple_tag
+def define(val=None):
+    """Define a var that can be changed within Template."""
+    return val
+
+
 @register.simple_tag(takes_context=True)
 def param_replace(context, **kwargs):
     """

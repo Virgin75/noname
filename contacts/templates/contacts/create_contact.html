@@ -1,12 +1,17 @@
-{% extends "commons/base.html" %}
-
-{% block title %}Create a Contact{% endblock %}
-
-{% block content %}
-    <h1>Create a new contact</h1>
-    <form method="post">{% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Create">
+<dialog id="create_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Create a new Contact</h3>
+    <form method="POST" action="{% url "contacts:create_contact" %}">
+      {% csrf_token %}
+      {{ create_form.as_div }}
+      <button
+        type="submit"
+        class="btn btn-primary mt-5">
+          Create
+      </button>
     </form>
-    <br>
-{% endblock %}
+  </div>
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+      </form>
+</dialog>

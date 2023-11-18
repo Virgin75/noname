@@ -4388,6 +4388,10 @@ details.collapse summary::-webkit-details-marker {
   fill: hsl(var(--a) / 1);
 }
 
+.fill-current {
+  fill: currentColor;
+}
+
 .stroke-current {
   stroke: currentColor;
 }
