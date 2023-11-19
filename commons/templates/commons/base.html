@@ -1,40 +1,40 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html data-theme="light" lang="en">
-<head>
-    <meta charset="UTF-8">
-    {% tailwind_css %}
-    <title>{% block title %}Noname{% endblock %}</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        {% tailwind_css %}
+        <title>{% block title %}Noname{% endblock %}</title>
+    </head>
 
-<body class="flex flex-row">
-    <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
+    <body class="flex flex-row">
+        <script src="https://unpkg.com/htmx.org@1.2.1" defer></script>
 
-    <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 min-w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
-        {% include 'commons/menu.html' %}
-    </div>
-    <div id="menu-mobile" class="mobile:absolute bottom-8 left-10 desktop:hidden">
-        <button class="rounded-full bg-base-100 p-3 shadow-2xl" onclick="menumodal.showModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-        </button>
-        <dialog id="menumodal" class="modal">
-          <div class="flex flex-col modal-box w-11/12 max-w-5xl h-screen gap-6 mt-2">
+        <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 min-w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
             {% include 'commons/menu.html' %}
-            <svg class="sticky top-10 h-10 w-10 hover:cursor-pointer" onclick="menumodal.close()" viewBox="0 0 24 24" stroke="currentColor" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z"/></svg>
-          </div>
-        </dialog>
-    </div>
+        </div>
+        <div id="menu-mobile" class="mobile:absolute bottom-8 left-10 desktop:hidden">
+            <button class="rounded-full bg-base-100 p-3 shadow-2xl" onclick="menumodal.showModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+            </button>
+            <dialog id="menumodal" class="modal">
+                <div class="flex flex-col modal-box w-11/12 max-w-5xl h-screen gap-6 mt-2">
+                    {% include 'commons/menu.html' %}
+                    <svg class="sticky top-10 h-10 w-10 hover:cursor-pointer" onclick="menumodal.close()" viewBox="0 0 24 24" stroke="currentColor" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z"/></svg>
+                </div>
+            </dialog>
+        </div>
 
-    <div id="page-content" class="py-10 px-12 bg-base-200 flex-grow">
-        {% block content %}
-        {% endblock %}
-        {% include 'commons/alert_message.html' %}
-    </div>
-<script type="text/javascript">
-      document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      });
+        <div id="page-content" class="py-10 px-12 bg-base-200 flex-grow">
+            {% block content %}
+            {% endblock %}
+            {% include 'commons/alert_message.html' %}
+        </div>
+        <script type="text/javascript">
+            document.body.addEventListener('htmx:configRequest', (event) => {
+                event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+            });
 
-</script>
-</body>
+        </script>
+    </body>
 </html>

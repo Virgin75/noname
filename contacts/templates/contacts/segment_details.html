@@ -4,7 +4,7 @@
 
 {% block content %}<script src="https://unpkg.com/htmx.org@1.2.1"></script>
   <h2>Edit "{{ object.name }}" Segment:</h2>
-    <form method="post">
+  <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <br>
@@ -12,11 +12,11 @@
     <button type="submit">Update</button>
 
   </form>
-    {% for group_form, group_id in group_forms %}
-            <form hx-post="/groups/{{ group_id }}/update" hx-target="#useless" hx-trigger="change">
-                {% csrf_token %}
-                {{ group_form.as_p }}
-            </form>
-    {% endfor %}
-    <div id="useless"></div>
+  {% for group_form, group_id in group_forms %}
+    <form hx-post="/groups/{{ group_id }}/update" hx-target="#useless" hx-trigger="change">
+      {% csrf_token %}
+      {{ group_form.as_p }}
+    </form>
+  {% endfor %}
+  <div id="useless"></div>
 {% endblock %}

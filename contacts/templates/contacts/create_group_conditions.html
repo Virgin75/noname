@@ -1,7 +1,7 @@
 <script>
-      document.body.addEventListener('htmx:configRequest', (event) => {
+    document.body.addEventListener('htmx:configRequest', (event) => {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      })
+    })
 </script>
 <h2>Define the conditions matching with your segment:</h2>
 <span>Contacts in this segment must match </span>
@@ -10,7 +10,7 @@
         {{ form.as_p }}
         <input type="hidden" name="segment_id" value="{{ segment.id }}">
     </form>
-<span>of the following conditions:</span>
+    <span>of the following conditions:</span>
     <br>
     <button hx-post="/groups/{{group.id}}/add_filter" hx-target="#filters-container" hx-swap="beforeend">Add filter</button>
     <div id="filters-container">

@@ -1,7 +1,7 @@
 {% extends "commons/base_logged_out.html" %}
 {% block content %}
     <div class="prose max-w-none flex items-center justify-center h-screen flex-col gap-8">
-    <h1 class="heading-1">Successfully logged out.</h1>
-    <a class="btn btn-primary" href="{% url 'users:login' %}">Log back in.</a>
+        <h1 class="heading-1">Successfully logged out.</h1>
+        <a class="btn btn-primary" href="{% url 'users:login' %}">Log back in.</a>
     </div>
 {% endblock %}

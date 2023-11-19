@@ -1,19 +1,19 @@
 <dialog id="delete_modal_{{ contact.id }}" class="modal">
   <div class="modal-box">
     <p>Are you sure you want to delete the Contact: <b> {{ contact.email }}</b>?</p>
-      <div class="flex flex-row justify-end items-end gap-2">
-          <form method="post" action="{% url "contacts:delete_contact" contact.id %}">
+    <div class="flex flex-row justify-end items-end gap-2">
+      <form method="post" action="{% url "contacts:delete_contact" contact.id %}">
         {% csrf_token %}
         <button
-            type="submit"
-            class="btn btn-primary mt-5">
-              Confirm deletion
-          </button>
-    </form>
+          type="submit"
+          class="btn btn-primary mt-5">
+          Confirm deletion
+        </button>
+      </form>
       <form method="dialog">
-            <button class="btn">Cancel</button>
-        </form>
-      </div>
+        <button class="btn">Cancel</button>
+      </form>
+    </div>
 
   </div>
 </dialog>

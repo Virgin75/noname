@@ -10,25 +10,25 @@
     {% else %}
         {%  include "commons/ordering.html" %}
         {%  include "commons/filters.html" %}
-       <table>
-        <tr>
-            {% for field in fields %}
-                <td><b>{{field}}</b></td>
-            {% endfor %}
-        </tr>
-        {% for segment in filter.qs %}
+        <table>
             <tr>
-                <td>{{ segment.id }}</td>
-                <td>{{ segment.name }}</td>
-                <td>{{ segment.description }}</td>
-                <td>{{ segment.members_count }}</td>
-                <td><a href="{% url 'contacts:segment_details' segment.id %}">Edit</a></td>
-                <td><a href="{% url 'contacts:delete_segment' segment.id %}">Delete</a></td>
+                {% for field in fields %}
+                    <td><b>{{field}}</b></td>
+                {% endfor %}
             </tr>
-        {% endfor %}
-    </table>
+            {% for segment in filter.qs %}
+                <tr>
+                    <td>{{ segment.id }}</td>
+                    <td>{{ segment.name }}</td>
+                    <td>{{ segment.description }}</td>
+                    <td>{{ segment.members_count }}</td>
+                    <td><a href="{% url 'contacts:segment_details' segment.id %}">Edit</a></td>
+                    <td><a href="{% url 'contacts:delete_segment' segment.id %}">Delete</a></td>
+                </tr>
+            {% endfor %}
+        </table>
 
-    <br>
+        <br>
 
     {% endif %}
 

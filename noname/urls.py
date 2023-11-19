@@ -13,15 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('users/', include(('users.urls', 'users'), namespace='users')),
-    path('', include(('commons.urls', 'commons'), namespace='commons')),
-    path('', include(('contacts.urls', 'contacts'), namespace='contacts')),
-    path("__reload__/", include("django_browser_reload.urls")),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) if settings.ENV == 'local' else []
+urlpatterns = (
+    [
+        path("admin/", admin.site.urls),
+        path("users/", include(("users.urls", "users"), namespace="users")),
+        path("", include(("commons.urls", "commons"), namespace="commons")),
+        path("", include(("contacts.urls", "contacts"), namespace="contacts")),
+        path("__reload__/", include("django_browser_reload.urls")),
+    ]
+    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    if settings.ENV == "local"
+    else []
+)

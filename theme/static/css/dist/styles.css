@@ -3841,6 +3841,10 @@ details.collapse summary::-webkit-details-marker {
   position: static;
 }
 
+.\!static {
+  position: static !important;
+}
+
 .\!fixed {
   position: fixed !important;
 }
@@ -4968,6 +4972,50 @@ details.collapse summary::-webkit-details-marker {
 
 .\[user\:passwd\@\] {
   user: passwd@;
+}
+
+.\[e\:\675\FFFD\] {
+  e: ٵ�;
+}
+
+.\[imports_tail\:0\] {
+  imports_tail: 0;
+}
+
+.\[output_at\:0\] {
+  output_at: 0;
+}
+
+.\[prev_col\:start_col\] {
+  prev_col: start col;
+}
+
+.\[prev_found\:found\] {
+  prev_found: found;
+}
+
+.\[previous_index\:start\] {
+  previous_index: start;
+}
+
+.\[quote_len\:-quote_len\] {
+  quote_len: -quote len;
+}
+
+.\[column\:s_column\] {
+  column: s column;
+}
+
+.\[previous_column\:start_column\] {
+  previous_column: start column;
+}
+
+.\[string_start\:string_end\] {
+  string_start: string end;
+}
+
+.\[h\:i\] {
+  h: i;
 }
 
 .heading-1 {

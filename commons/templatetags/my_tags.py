@@ -3,7 +3,7 @@ from django import template
 register = template.Library()
 
 
-@register.filter(name='ordered_unique_groups')
+@register.filter(name="ordered_unique_groups")
 def ordered_unique_groups(value):
     return sorted(set(x.grouper for x in value if x.grouper is not None))
 
@@ -29,7 +29,7 @@ def param_replace(context, **kwargs):
     Based on
     https://stackoverflow.com/questions/22734695/next-and-before-links-for-a-django-paginated-query/22735278#22735278
     """
-    d = context['request'].GET.copy()
+    d = context["request"].GET.copy()
     for k, v in kwargs.items():
         d[k] = v
     for k in [k for k, v in d.items() if not v]:

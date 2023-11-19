@@ -1,21 +1,22 @@
 from django import forms
-from users.models import Account, Company
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
+from users.models import Account, Company
 
 
 class AuthForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'input input-bordered input-primary w-full'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'input input-bordered input-primary w-full'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={"class": "input input-bordered input-primary w-full"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "input input-bordered input-primary w-full"}))
 
 
 class UserRegisterForm(UserCreationForm):
     class Meta:
         model = Account
-        fields = ['email', 'first_name', 'last_name']
+        fields = ["email", "first_name", "last_name"]
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
+        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
@@ -27,10 +28,10 @@ class UserRegisterForm(UserCreationForm):
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['name', 'address', 'city', 'country']
+        fields = ["name", "address", "city", "country"]
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
+        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):

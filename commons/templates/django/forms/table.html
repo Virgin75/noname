@@ -1,49 +1,49 @@
 {% load my_tags %}
 {% regroup fields by 0.group as groups %}
 <div class="flex flex-row justify-end">
-        <div class="join rounded-2xl">
-            {% for field, errors in fields %}
-                {% if field.group == "search" %}
-                    {{ field }}
-                    <button type="submit" class="btn join-item bg-base-300"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.6 21L13.3 14.7C12.8 15.1 12.225 15.4167 11.575 15.65C10.925 15.8833 10.2333 16 9.5 16C7.68333 16 6.14583 15.3708 4.8875 14.1125C3.62917 12.8542 3 11.3167 3 9.5C3 7.68333 3.62917 6.14583 4.8875 4.8875C6.14583 3.62917 7.68333 3 9.5 3C11.3167 3 12.8542 3.62917 14.1125 4.8875C15.3708 6.14583 16 7.68333 16 9.5C16 10.2333 15.8833 10.925 15.65 11.575C15.4167 12.225 15.1 12.8 14.7 13.3L21 19.6L19.6 21ZM9.5 14C10.75 14 11.8125 13.5625 12.6875 12.6875C13.5625 11.8125 14 10.75 14 9.5C14 8.25 13.5625 7.1875 12.6875 6.3125C11.8125 5.4375 10.75 5 9.5 5C8.25 5 7.1875 5.4375 6.3125 6.3125C5.4375 7.1875 5 8.25 5 9.5C5 10.75 5.4375 11.8125 6.3125 12.6875C7.1875 13.5625 8.25 14 9.5 14Z" fill="currentColor"/></svg></button>
-                {% endif %}
-            {% endfor %}
-            {% for group in groups|ordered_unique_groups  %}
-                {% if group == "filters" %}
-                        <div class="indicator">
-                            <span class="indicator-item badge bg-accent/50 {% if not form.active_filters %}hidden{% endif %}">{{ form.active_filters }}</span>
-                            <button type="reset" class="btn join-item bg-base-300" onclick="filters_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z" fill="currentColor"/>
-                    </svg>
-                    Filters</button>
-                        </div>
-                {% endif %}
-                {% if group == "sort" %}
-                    <div class="indicator">
-            <span class="indicator-item badge bg-accent/50"></span>
-            <button type="reset" class="btn join-item bg-base-300"  onclick="sort_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8 13V5.825L5.425 8.4L4 7L9 2L14 7L12.575 8.4L10 5.825V13H8ZM15 22L10 17L11.425 15.6L14 18.175V11H16V18.175L18.575 15.6L20 17L15 22Z" fill="currentColor"/>
-</svg>Order by</button>
+  <div class="join rounded-2xl">
+    {% for field, errors in fields %}
+      {% if field.group == "search" %}
+        {{ field }}
+        <button type="submit" class="btn join-item bg-base-300"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.6 21L13.3 14.7C12.8 15.1 12.225 15.4167 11.575 15.65C10.925 15.8833 10.2333 16 9.5 16C7.68333 16 6.14583 15.3708 4.8875 14.1125C3.62917 12.8542 3 11.3167 3 9.5C3 7.68333 3.62917 6.14583 4.8875 4.8875C6.14583 3.62917 7.68333 3 9.5 3C11.3167 3 12.8542 3.62917 14.1125 4.8875C15.3708 6.14583 16 7.68333 16 9.5C16 10.2333 15.8833 10.925 15.65 11.575C15.4167 12.225 15.1 12.8 14.7 13.3L21 19.6L19.6 21ZM9.5 14C10.75 14 11.8125 13.5625 12.6875 12.6875C13.5625 11.8125 14 10.75 14 9.5C14 8.25 13.5625 7.1875 12.6875 6.3125C11.8125 5.4375 10.75 5 9.5 5C8.25 5 7.1875 5.4375 6.3125 6.3125C5.4375 7.1875 5 8.25 5 9.5C5 10.75 5.4375 11.8125 6.3125 12.6875C7.1875 13.5625 8.25 14 9.5 14Z" fill="currentColor"/></svg></button>
+      {% endif %}
+    {% endfor %}
+    {% for group in groups|ordered_unique_groups  %}
+      {% if group == "filters" %}
+        <div class="indicator">
+          <span class="indicator-item badge bg-accent/50 {% if not form.active_filters %}hidden{% endif %}">{{ form.active_filters }}</span>
+          <button type="reset" class="btn join-item bg-base-300" onclick="filters_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z" fill="currentColor"/>
+          </svg>
+            Filters</button>
         </div>
-                {% endif %}
-        {% endfor %}
+      {% endif %}
+      {% if group == "sort" %}
+        <div class="indicator">
+          <span class="indicator-item badge bg-accent/50"></span>
+          <button type="reset" class="btn join-item bg-base-300"  onclick="sort_modal.showModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 13V5.825L5.425 8.4L4 7L9 2L14 7L12.575 8.4L10 5.825V13H8ZM15 22L10 17L11.425 15.6L14 18.175V11H16V18.175L18.575 15.6L20 17L15 22Z" fill="currentColor"/>
+          </svg>Order by</button>
         </div>
+      {% endif %}
+    {% endfor %}
+  </div>
 </div>
 
 <dialog id="filters_modal" class="modal">
   <div class="modal-box">
-  <svg class="w-12 h-12 fill-accent" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z"/></svg>
+    <svg class="w-12 h-12 fill-accent" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11 20C10.7167 20 10.4792 19.9042 10.2875 19.7125C10.0959 19.5208 10 19.2833 10 19V13L4.20002 5.6C3.95002 5.26667 3.91252 4.91667 4.08752 4.55C4.26252 4.18333 4.56669 4 5.00002 4H19C19.4334 4 19.7375 4.18333 19.9125 4.55C20.0875 4.91667 20.05 5.26667 19.8 5.6L14 13V19C14 19.2833 13.9042 19.5208 13.7125 19.7125C13.5209 19.9042 13.2834 20 13 20H11ZM12 12.3L16.95 6H7.05002L12 12.3Z"/></svg>
     <h3 class="font-bold text-lg">Filters</h3>
     <p class="py-4">Choose your filters and click the "Validate" button.</p>
     <div class="modal-action flex flex-col gap-5">
-          {% for field, errors in fields %}
-          {% if field.group == "filters" %}
-            {{ field }}
-          {% endif %}
-          {% endfor %}
+      {% for field, errors in fields %}
+        {% if field.group == "filters" %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
       <div class="flex flex-row justify-end gap-3">
-          <button type="reset" class="btn" onclick="filters_modal.close()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Validate</button>
+        <button type="reset" class="btn" onclick="filters_modal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Validate</button>
       </div>
     </div>
   </div>
@@ -52,17 +52,17 @@
 <dialog id="sort_modal" class="modal">
   <div class="modal-box">
     <svg class="w-12 h-12 fill-accent" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M8 13V5.825L5.425 8.4L4 7L9 2L14 7L12.575 8.4L10 5.825V13H8ZM15 22L10 17L11.425 15.6L14 18.175V11H16V18.175L18.575 15.6L20 17L15 22Z"/></svg>
-      <h3 class="font-bold text-lg">Sort by</h3>
+    <h3 class="font-bold text-lg">Sort by</h3>
     <p class="py-4">Choose the ordering of the table and click the "Validate" button.</p>
     <div class="modal-action flex flex-col gap-5">
-          {% for field, errors in fields %}
-          {% if field.group == "sort" %}
-            {{ field }}
-          {% endif %}
-          {% endfor %}
+      {% for field, errors in fields %}
+        {% if field.group == "sort" %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
       <div class="flex flex-row justify-end gap-3">
-          <button type="reset" class="btn" onclick="sort_modal.close()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Validate</button>
+        <button type="reset" class="btn" onclick="sort_modal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Validate</button>
       </div>
     </div>
   </div>

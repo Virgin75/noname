@@ -6,16 +6,16 @@
   <div{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
     {% if field.use_fieldset %}
       <fieldset>
-      {% if field.label %}{{ field.legend_tag }}{% endif %}
+        {% if field.label %}{{ field.legend_tag }}{% endif %}
     {% else %}
-        <div class="flex flex-row gap-2">
-            {% if field.help_text %}
-            <div class=" flex tooltip justify-center items-center" data-tip="{{ field.help_text }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            {% endif %}
-            {% if field.label %}{{ field.label_tag }}{% endif %}
-        </div>
+      <div class="flex flex-row gap-2">
+        {% if field.help_text %}
+          <div class=" flex tooltip justify-center items-center" data-tip="{{ field.help_text }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+        {% endif %}
+        {% if field.label %}{{ field.label_tag }}{% endif %}
+      </div>
 
     {% endif %}
 
@@ -25,7 +25,7 @@
     {% if forloop.last %}
       {% for field in hidden_fields %}{{ field }}{% endfor %}
     {% endif %}
-</div>
+  </div>
 {% endfor %}
 {% if not fields and not errors %}
   {% for field in hidden_fields %}{{ field }}{% endfor %}
