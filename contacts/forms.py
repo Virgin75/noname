@@ -34,7 +34,7 @@ class ContactForm(FilteredModelForm):
 class ContactFormFilters(FilteredModelForm):
     class Meta:
         model = Contact
-        exclude = ['belongs_to', 'fields', 'updated_by']
+        exclude = ['belongs_to', 'fields', 'updated_by', 'unsubscribed_date']
 
     def __init__(self, *args, **kwargs):
         """Override __init__ to declare dynamically the custom fields."""

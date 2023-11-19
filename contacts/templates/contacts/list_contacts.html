@@ -25,12 +25,45 @@
                 </div>
             </div>
         {% else %}
-        <div id="metrics" class="flex">
+        <div id="metrics" class="flex gap-5">
           <div class="stats shadow {% if has_any_filters %} border-2 rounded-2xl border-accent/30{% endif %}">
               <div class="stat">
-                <div class="stat-title">{% if has_any_filters %}Filtered{% else %}Total{% endif %} custom fields</div>
+                <div class="stat-title">{% if has_any_filters %}Filtered{% else %}Total{% endif %} contacts</div>
                 <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_total_contacts }}</div>
                 <div class="stat-desc">{% if has_any_filters %}matching filters{% else %}created{% endif %}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">Last 30 days</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_contacts_last_30d }}</div>
+                <div class="stat-desc"></div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">Last 7 days</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_contacts_last_7d }}</div>
+                <div class="stat-desc"></div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">Today</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_contacts_today }}</div>
+                <div class="stat-desc"></div>
+              </div>
+          </div>
+        <div class="stats shadow {% if has_any_filters %} border-2 rounded-2xl border-accent/30{% endif %}">
+              <div class="stat">
+                <div class="stat-figure">
+                    <svg class="fill-green-600" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 19C10.05 19 8.39583 18.3208 7.0375 16.9625C5.67917 15.6042 5 13.95 5 12C5 10.05 5.67917 8.39583 7.0375 7.0375C8.39583 5.67917 10.05 5 12 5C13.95 5 15.6042 5.67917 16.9625 7.0375C18.3208 8.39583 19 10.05 19 12C19 13.95 18.3208 15.6042 16.9625 16.9625C15.6042 18.3208 13.95 19 12 19Z" /></svg>
+                </div>
+                <div class="stat-title text-green-600">Subscribed</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_contacts_status.count_sub }}</div>
+                <div class="stat-desc">reachable</div>
+              </div>
+              <div class="stat">
+                <div class="stat-figure">
+                    <svg class="fill-red-600" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 19C10.05 19 8.39583 18.3208 7.0375 16.9625C5.67917 15.6042 5 13.95 5 12C5 10.05 5.67917 8.39583 7.0375 7.0375C8.39583 5.67917 10.05 5 12 5C13.95 5 15.6042 5.67917 16.9625 7.0375C18.3208 8.39583 19 10.05 19 12C19 13.95 18.3208 15.6042 16.9625 16.9625C15.6042 18.3208 13.95 19 12 19Z" /></svg>
+                </div>
+                <div class="stat-title text-red-500">Unsubscribed</div>
+                <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_contacts_status.count_unsub }}</div>
+                <div class="stat-desc">You cannot contact</div>
               </div>
           </div>
         </div>

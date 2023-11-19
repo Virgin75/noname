@@ -2,7 +2,7 @@ import datetime
 
 from django.urls import reverse_lazy
 from django.template import Template
-
+from django.utils import timezone
 from commons.views import FilterMixin
 from contacts.forms import ContactForm, CustomFieldForm, SegmentForm, GroupForm, FilterForm
 from contacts.models import Contact, AllowedField, Segment, Group, Filter
@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView, FormView, BaseUpdateView, Upda
 from django.views.generic.list import ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.fields.json import KT
+from django.db.models import Count
 from django.core.paginator import Paginator
 from django.template.loader import get_template
 from django.contrib import messages
@@ -79,6 +80,16 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
         )
         context['create_form'] = ContactForm(request=self.request)
         context['stats_total_contacts'] = context["filter"].qs.count()
+        last_30_days = datetime.datetime.now() - datetime.timedelta(days=30)
+        last_7_days = datetime.datetime.now() - datetime.timedelta(days=7)
+        today_min = datetime.datetime.combine(timezone.now().date(), datetime.datetime.today().time().min)
+        today_max = datetime.datetime.combine(timezone.now().date(), datetime.datetime.today().time().max)
+        context['stats_contacts_last_30d'] = context["filter"].qs.filter(created_at__gte=last_30_days).values('id').count()
+        context['stats_contacts_last_7d'] = context["filter"].qs.filter(created_at__gte=last_7_days).values('id').count()
+        context['stats_contacts_today'] = context["filter"].qs.filter(created_at__range=(today_min, today_max)).values('id').count()
+        context['stats_contacts_status'] = context["filter"].qs.aggregate(
+            count_unsub=Count('id') - Count('is_unsubscribed'), count_sub=Count('is_unsubscribed')
+        )
         return context
 
 

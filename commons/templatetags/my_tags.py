@@ -3,10 +3,9 @@ from django import template
 register = template.Library()
 
 
-@register.simple_tag
-def define(val=None):
-    """Define a var that can be changed within Template."""
-    return val
+@register.filter(name='ordered_unique_groups')
+def ordered_unique_groups(value):
+    return sorted(set(x.grouper for x in value if x.grouper is not None))
 
 
 @register.simple_tag(takes_context=True)

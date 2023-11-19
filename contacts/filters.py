@@ -8,6 +8,8 @@ from contacts.models import Contact, AllowedField, Segment
 class ContactFilter(FilterSet):
     search = CharFilter(method="filter_search", widget=SearchInput(attrs={'placeholder': 'Search...'}))
     search.field.group = "search"
+    is_unsubscribed = ChoiceFilter(choices=((True, 'Yes'), (False, 'No')), lookup_expr='exact', empty_label="Is unsub?")
+    is_unsubscribed.field.group = "filters"
     order_by = OrderingFilter(fields=[('email', 'email'), ('created_at', 'created_at'), ('updated_at', 'updated_at')])
     order_by.field.group = "sort"
 

@@ -12,6 +12,8 @@ class Contact(HistoryMixin):
     email = models.EmailField()
     belongs_to = models.ForeignKey('users.Company', on_delete=models.CASCADE, null=True, blank=True)
     fields = models.JSONField(default=dict)
+    is_unsubscribed = models.BooleanField(default=False)
+    unsubscribed_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.email
