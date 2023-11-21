@@ -28,7 +28,7 @@ echo ""
 ################################################################################
 #                                  FLAKE 8                                     #
 ################################################################################
-echo -n "${Cyan}Running flake8... $Color_Off"
+echo -n "${Cyan}Running flake8 to check code conventions... $Color_Off"
 out=$(flake8 .)
 if [ "$?" -ne 0 ] ; then
   echo "${Red}Error !$Color_Off"
@@ -43,7 +43,7 @@ echo ""
 ################################################################################
 #                                PYDOCSTYLE                                    #
 ################################################################################
-echo -n "${Cyan}Running pydocstyle... $Color_Off"
+echo -n "${Cyan}Running pydocstyle to check docstrings... $Color_Off"
 out=$(pydocstyle --count)
 if [ "$?" -ne 0 ] ; then
   echo "${Red}Error !$Color_Off"

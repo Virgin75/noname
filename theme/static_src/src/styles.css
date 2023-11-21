@@ -1,6 +1,29 @@
 @tailwind base;
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #c98adb #ffffff;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    @apply bg-base-100;
+      @apply rounded-2xl;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-base-300;
+      @apply rounded-full;
+      @apply shadow-inner;
+  }
 @tailwind components;
 @tailwind utilities;
+
 .heading-1 {
     @apply text-4xl;
     @apply font-bold;

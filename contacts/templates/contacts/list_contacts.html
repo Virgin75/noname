@@ -69,14 +69,18 @@
             </div>
 
             {% include "commons/filters.html" %}
-            <div class="flex bg-base-100 flex-grow rounded-2xl">
+            <div class="flex bg-base-100 flex-grow rounded-2xl shadow-sm">
                 <div class="overflow-x-auto w-full rounded-2xl">
                     <table class="table table-zebra table-pin-rows table-pin-cols">
                 <!-- head -->
                         <thead>
                             <tr>
-                                {% for field in fields %}
-                                    <th><b>{{field}}</b></th>
+                                {% for field, sticky in fields.items %}
+                                    {% if sticky %}
+                                        <th><b>{{field}}</b></th>
+                                    {% else %}
+                                        <td><b>{{field}}</b></td>
+                                    {% endif %}
                                 {% endfor %}
                                 <th></th>
                             </tr>

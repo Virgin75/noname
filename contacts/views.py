@@ -85,11 +85,7 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
     def get_context_data(self, **kwargs):
         """Pass extra data to the template: fields names and filtered queryset."""
         context = super().get_context_data(**kwargs)
-        context["fields"] = (
-            ["id", "email"]
-            + list(AllowedField.objects.filter(belongs_to=self.request.user.company).values_list("name", flat=True))
-            + ["created_at", "updated_at", "updated_by"]
-        )
+        context["fields"] = {"id": "sticky", "email": "sticky"} | {f: None for f in list(AllowedField.objects.filter(belongs_to=self.request.user.company).values_list("name", flat=True))} | {"created_at": None, "updated_at": None, "updated_by": None}
         context["create_form"] = ContactForm(request=self.request)
         context["stats_total_contacts"] = context["filter"].qs.count()
         last_30_days = datetime.datetime.now() - datetime.timedelta(days=30)
