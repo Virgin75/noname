@@ -38,6 +38,7 @@
     <div class="modal-action flex flex-col gap-5">
       {% for field, errors in fields %}
         {% if field.group == "filters" %}
+            {{ field.label }}
           {{ field }}
         {% endif %}
       {% endfor %}

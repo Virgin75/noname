@@ -39,3 +39,6 @@
 .heading-4 {
     @apply text-xl;
 }
+.border-1 {
+    border-width: 1px;
+}

@@ -1,5 +1,5 @@
-from django.forms import ModelForm
-
+from django.forms import ModelForm, IntegerField
+from django_filters import NumberFilter
 
 class FilteredModelForm(ModelForm):
     def as_search_filters(self):
@@ -15,3 +15,8 @@ class FilteredModelForm(ModelForm):
             except AttributeError:
                 pass
             yield name, bound_item
+
+
+class IntegerFilter(NumberFilter):
+    """Override default DecimalField to IntegerField."""
+    field_class = IntegerField

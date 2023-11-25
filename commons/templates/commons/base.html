@@ -8,10 +8,10 @@
     </head>
 
     <body class="flex flex-row">
-        <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 min-w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
+        <div id="menu-desktop" class="mobile:hidden desktop:flex flex-col gap-6 w-[21%] bg-base-100 h-screen px-7 py-10 shadow-5xl">
             {% include 'commons/menu.html' %}
         </div>
-        <div id="menu-mobile" class="mobile:absolute bottom-8 left-10 desktop:hidden">
+        <div id="menu-mobile" class="mobile:absolute bottom-8 left-10 z-50 desktop:hidden">
             <button class="rounded-full bg-base-100 p-3 shadow-2xl" onclick="menumodal.showModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
             </button>
@@ -22,7 +22,7 @@
                 </div>
             </dialog>
         </div>
-        <div id="page-content" class="py-10 px-12 bg-base-200 max-w-[79%]">
+        <div id="page-content" class="py-10 px-12 bg-base-200 desktop:w-[79%] mobile:w-full">
             {% block content %}
             {% endblock %}
             {% include 'commons/alert_message.html' %}

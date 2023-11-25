@@ -5,6 +5,8 @@ from contacts.models import AllowedField, Contact, Filter, Group, Segment
 
 
 class ContactForm(FilteredModelForm):
+    unsubscribed_date = forms.DateField(required=False)
+
     class Meta:
         model = Contact
         exclude = ["belongs_to", "fields", "updated_by"]
