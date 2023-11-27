@@ -1,10 +1,20 @@
 {% for message in messages %}
-    <div id="alerts" class="alert alert-{{ message.tags }} sticky bottom-12 animate-fadein-out">
+    <div id="alerts" role="alert" class="alert shadow-lg sticky bottom-12 animate-fadein-out">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         <span>{{ message }}</span>
     </div>
     <script type="text/javascript">
         var alerts = document.getElementById("alerts");
+        var type = "{{ message.tags }}";
+        if (type === "success") {
+            alerts.classList.add("alert-success");
+        } else if (type === "info") {
+            alerts.classList.add("alert-info");
+        } else if (type === "warning") {
+            alerts.classList.add("alert-warning");
+        } else if (type === "error") {
+            alerts.classList.add("alert-error");
+        }
         setTimeout(function(){ alerts.classList.add("hidden"); }, 4000);
     </script>
 {% endfor %}

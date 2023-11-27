@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from commons.models import HistoryMixin
 
@@ -18,6 +19,12 @@ class Contact(HistoryMixin):
 
     def __str__(self):
         return self.email
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        """Override save to set unsubscribed_date when is_unsubscribed is set to True."""
+        if self.is_unsubscribed and self.unsubscribed_date is None:
+            self.unsubscribed_date = timezone.now()
+        super().save(force_insert, force_update, using, update_fields)
 
 
 class AllowedField(models.Model):

@@ -120,6 +120,7 @@ class UpdateContactView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         """Override 'get_form_kwargs()' to pass the request data to the form."""
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
+        kwargs["custom_fields_values"] = self.object.fields
         return kwargs
 
     def form_valid(self, form):

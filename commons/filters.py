@@ -11,7 +11,8 @@ class FilteredModelForm(ModelForm):
         for name, value in self.fields.items():
             bound_item = self[name]
             try:
-                bound_item.group = value.group
+                bound_item.cols = getattr(value, "cols", 1)
+                bound_item.group = getattr(value, "group", None)
             except AttributeError:
                 pass
             yield name, bound_item
