@@ -1,5 +1,7 @@
+
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from commons.models import HistoryMixin
 
@@ -69,8 +71,14 @@ class Segment(HistoryMixin):
     def __str__(self):
         return self.name
 
-    @property
+    @cached_property
     def members_count(self):
+        """
+        Return the number of members in the Segment.
+
+        (!) Need to delete the cache when a Contact is added/removed from
+        the Segment with 'del self.members_count()'.
+        """
         return self.members.count()
 
 

@@ -85,7 +85,16 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
     def get_context_data(self, **kwargs):
         """Pass extra data to the template: fields names and filtered queryset."""
         context = super().get_context_data(**kwargs)
-        context["fields"] = {"": "sticky", "Email": "sticky"} | {f: None for f in list(AllowedField.objects.filter(belongs_to=self.request.user.company).values_list("name", flat=True))} | {"Creation date": None, "Last update date": None, "Updated by": None}
+        context["fields"] = (
+            {"": "sticky", "Email": "sticky"}
+            | {
+                f: None
+                for f in list(
+                    AllowedField.objects.filter(belongs_to=self.request.user.company).values_list("name", flat=True)
+                )
+            }
+            | {"Creation date": None, "Last update date": None, "Updated by": None}
+        )
         context["create_form"] = ContactForm(request=self.request)
         context["stats_total_contacts"] = context["filter"].qs.count()
         last_30_days = datetime.datetime.now() - datetime.timedelta(days=30)
@@ -158,7 +167,7 @@ class ListCustomField(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, List
     def get_context_data(self, **kwargs):
         """Pass extra data to the template: fields names and filtered queryset."""
         context = super().get_context_data(**kwargs)
-        context["fields"] = ["id", "Field name", "Field type"]
+        context["fields"] = ["", "Field name", "Field type"]
         context["create_form"] = CustomFieldForm()
         context["stats_total_fields"] = context["filter"].qs.count()
         return context
@@ -192,9 +201,12 @@ class DeleteCustomField(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     success_message = "Field deleted successfully."
 
 
-class ListSegment(SuccessMessageMixin, LoginRequiredMixin, ListView):
+class ListSegment(SuccessMessageMixin, LoginRequiredMixin, FilterMixin, ListView):
+    """View used to list existing Segments for the current user."""
+
     template_name = "contacts/list_segments.html"
-    paginate_by = 20
+    filterset_class = SegmentFilter
+    paginate_by = 10
 
     def get_queryset(self):
         """Filter Segments with the user's Company."""
@@ -203,35 +215,30 @@ class ListSegment(SuccessMessageMixin, LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Pass extra data to the template: fields names and filtered queryset."""
         context = super().get_context_data(**kwargs)
-        context["fields"] = ["id", "Name", "Description", "Members"]
-        context["filter"] = SegmentFilter(self.request.GET, queryset=self.get_queryset())
+        context["fields"] = ["", "Segment name", "Description", "Subscribers in segment", ""]
+        context["create_form"] = SegmentForm()
+        context["stats_total_segments"] = context["filter"].qs.count()
         return context
 
 
-class CreateSegment(LoginRequiredMixin, FormView):
+class CreateSegment(SuccessMessageMixin, LoginRequiredMixin, FormView):
     """View used to create a new Segment."""
 
     template_name = "contacts/create_segment.html"
     form_class = SegmentForm
+    success_message = "Segment created successfully."
 
-    def get_form_kwargs(self):
-        """Override 'get_form_kwargs()' to pass the request data to the form."""
-        kwargs = super().get_form_kwargs()
-        kwargs["request"] = self.request
-        return kwargs
+    def form_invalid(self, form):
+        """Override 'form_invalid()' to return the form with errors."""
+        messages.error(self.request, "Error creating field.")
+        return HttpResponseRedirect(reverse_lazy("contacts:list_custom_fields"))
 
     def form_valid(self, form):
         """Override 'form_valid()' to update 'belongs_to' field."""
         segment = form.save(commit=False)
         segment.belongs_to = self.request.user.company
         segment.save()
-        group_form = GroupForm()
-        group = Group.objects.create(belongs_to=self.request.user.company, segment=segment)
-        return TemplateResponse(
-            self.request,
-            "contacts/create_group_conditions.html",
-            {"group": group, "form": group_form, "segment": segment},
-        )
+        return HttpResponseRedirect(reverse_lazy("contacts:segment_details", kwargs={"pk": segment.id}))
 
 
 class UpdateGroupSegment(LoginRequiredMixin, FormView):
@@ -280,7 +287,6 @@ class UpdateFilterView(LoginRequiredMixin, FormView):
 class DeleteSegment(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     """View used to delete a Segment."""
 
-    template_name = "contacts/delete_segment.html"
     model = Segment
     success_url = reverse_lazy("contacts:list_segments")
     success_message = "Segment deleted successfully."

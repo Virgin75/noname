@@ -1,35 +1,65 @@
 {% extends "commons/base.html" %}
-
 {% block title %}Segments{% endblock %}
-
 {% block content %}
-    <h1>Segments:</h1>
-    <a href="{% url 'contacts:create_segment' %}">+ Create a new dynamic segment</a>
-    {% if not filter.qs %}
-        <h2>You have no segment.</h2>
-    {% else %}
-        {%  include "commons/ordering.html" %}
-        {%  include "commons/filters.html" %}
-        <table>
-            <tr>
-                {% for field in fields %}
-                    <td><b>{{field}}</b></td>
-                {% endfor %}
-            </tr>
-            {% for segment in filter.qs %}
-                <tr>
-                    <td>{{ segment.id }}</td>
-                    <td>{{ segment.name }}</td>
-                    <td>{{ segment.description }}</td>
-                    <td>{{ segment.members_count }}</td>
-                    <td><a href="{% url 'contacts:segment_details' segment.id %}">Edit</a></td>
-                    <td><a href="{% url 'contacts:delete_segment' segment.id %}">Delete</a></td>
-                </tr>
-            {% endfor %}
-        </table>
+    {% include "contacts/create_segment.html" %}
+    <div id="page-content" class="flex flex-col gap-5">
+        <div class="flex flex-wrap gap-5">
+            <div class="flex flex-row gap-2 items-center">
+                <svg class="fill-primary w-12 h-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.55 18.2L15.725 12H11.725L12.45 6.325L7.825 13H11.3L10.55 18.2ZM8 22L9 15H4L13 2H15L14 10H20L10 22H8Z"/></svg>
+                <h1 class="heading-1">Segments</h1>
+            </div>
+            <button class="btn btn-primary ml-auto" onclick="create_modal.showModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 13H5V11H11V5H13V11H19V13H13V19H11V13Z" fill="currentColor"/></svg>
+                Create new Segment
+            </button>
+        </div>
+        <p class="text max-w-3xl mb-2">Segments allow you to dynamically and automatically regroup your Contacts depending on chosen conditions.</p>
+        {% if not paginated_objects and not existing_obj %}
+            <div class="flex justify-center items-center flex-grow">
+                <div class="flex flex-col gap-5 bg-base-200 rounded-2xl border-dashed border-base-300 border-4 p-16 justify-center items-center">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.55 18.2L15.725 12H11.725L12.45 6.325L7.825 13H11.3L10.55 18.2ZM8 22L9 15H4L13 2H15L14 10H20L10 22H8Z" fill="currentColor"/>
+                    </svg>
+                    <h2 class="heading-2 text-center">Create your first segment</h2>
+                    <button class="btn btn-primary" onclick="create_modal.showModal()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 13H5V11H11V5H13V11H19V13H13V19H11V13Z" fill="currentColor"/></svg>
+                        Create new segment
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            <div id="metrics" class="flex">
+                <div class="stats shadow {% if has_any_filters %} border-2 rounded-2xl border-accent/30{% endif %}">
+                    <div class="stat">
+                        <div class="stat-title">{% if has_any_filters %}Filtered{% else %}Total{% endif %} segments</div>
+                        <div class="stat-value {% if has_any_filters %}text-accent{% endif %}">{{ stats_total_segments }}</div>
+                        <div class="stat-desc">{% if has_any_filters %}matching filters{% else %}created{% endif %}</div>
+                    </div>
+                </div>
+            </div>
 
-        <br>
-
-    {% endif %}
-
+            {% include "commons/filters.html" %}
+            <div class="flex bg-base-100 flex-grow rounded-2xl">
+                <div class="overflow-x-auto w-full rounded-2xl shadow-sm">
+                    <table class="table table-zebra table-pin-rows table-pin-cols">
+                <!-- head -->
+                        <thead>
+                            <tr>
+                                {% for field in fields %}
+                                    <th><b>{{field}}</b></th>
+                                {% endfor %}
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for obj in paginated_objects %}
+                                {% include "contacts/segment_table_line.html" with id=obj.id name=obj.name description=obj.description count=obj.members_count %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include "commons/pagination.html" %}
+        {% endif %}
+    </div>
 {% endblock %}

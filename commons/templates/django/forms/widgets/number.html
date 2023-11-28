@@ -3,6 +3,6 @@
         <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 15V10.5H4V9H7V15H5.5ZM9 15V12.5C9 12.2167 9.09583 11.9792 9.2875 11.7875C9.47917 11.5958 9.71667 11.5 10 11.5H12V10.5H9V9H12.5C12.7833 9 13.0208 9.09583 13.2125 9.2875C13.4042 9.47917 13.5 9.71667 13.5 10V11.5C13.5 11.7833 13.4042 12.0208 13.2125 12.2125C13.0208 12.4042 12.7833 12.5 12.5 12.5H10.5V13.5H13.5V15H9ZM15 15V13.5H18V12.5H16V11.5H18V10.5H15V9H18.5C18.7833 9 19.0208 9.09583 19.2125 9.2875C19.4042 9.47917 19.5 9.71667 19.5 10V14C19.5 14.2833 19.4042 14.5208 19.2125 14.7125C19.0208 14.9042 18.7833 15 18.5 15H15Z" fill="currentColor"/></svg>
     </div>
     <input type="number" step="1" name="{{ widget.name }}" class="input w-full join-item"
-       {% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}
-       {% include "django/forms/widgets/attrs.html" %}>
+           {% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}
+           {% include "django/forms/widgets/attrs.html" %}>
 </div>

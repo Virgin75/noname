@@ -1,12 +1,21 @@
 import operator
+from functools import reduce
 
-from django_filters import CharFilter, ChoiceFilter, NumberFilter, FilterSet, OrderingFilter, BooleanFilter, TypedChoiceFilter
 from django import forms
 from django.db.models import Q
-from functools import reduce
+from django_filters import (
+    BooleanFilter,
+    CharFilter,
+    ChoiceFilter,
+    FilterSet,
+    NumberFilter,
+    OrderingFilter,
+    TypedChoiceFilter,
+)
+
 from commons.fields import SearchInput
 from commons.filters import IntegerFilter
-from contacts.forms import ContactForm, ContactFormFilters, CustomFieldForm
+from contacts.forms import ContactForm, ContactFormFilters, CustomFieldForm, SegmentForm
 from contacts.models import AllowedField, Contact, Segment
 
 
@@ -97,9 +106,15 @@ class CustomFieldFilter(FilterSet):
 
 
 class SegmentFilter(FilterSet):
+    name = CharFilter(lookup_expr="icontains", widget=SearchInput(attrs={"placeholder": "Search segments..."}))
+    name.field.group = "search"
+    order_by = OrderingFilter(fields=[("name", "name"), ("id", "id")])
+    order_by.field.group = "sort"
+
     class Meta:
         model = Segment
         fields = [
             "name",
             "updated_by",
         ]
+        form = SegmentForm

@@ -2,22 +2,22 @@
 {% block title %}My amazing site : user details{% endblock %}
 {% block content %}
   {% include "contacts/contact_details_header.html" %}
-    <div class="flex flex-col">
-        <div role="tablist" class="tabs tabs-boxed mb-4 bg-base-100 py-2 px-2 font-bold" style="width: fit-content;">
-          <a role="tab" class="tab tab-active text-sm">Contact details</a>
-          <a role="tab" class="tab text-current text-sm">Timeline of all activities</a>
-          <a role="tab" class="tab text-current text-sm">Others</a>
-        </div>
-        <div class="bg-base-100 rounded-2xl p-6">
-            <h2 class="text-2xl font-bold mb-2">Fields</h2>
-            <form method="post" class="flex gap-4 flex-wrap items-end">
-              {% csrf_token %}
-            {{ form.as_div }}
-            <button class="btn btn-primary" type="submit">Update</button>
-          </form>
-        <a class="btn mt-6" href="{% url "contacts:list_custom_fields" %}">Create new fields</a>
-        </div>
+  <div class="flex flex-col">
+    <div role="tablist" class="tabs tabs-boxed mb-4 bg-base-100 py-2 px-2 font-bold" style="width: fit-content;">
+      <a role="tab" class="tab tab-active text-sm">Contact details</a>
+      <a role="tab" class="tab text-current text-sm">Timeline of all activities</a>
+      <a role="tab" class="tab text-current text-sm">Others</a>
     </div>
+    <div class="bg-base-100 rounded-2xl p-6">
+      <h2 class="text-2xl font-bold mb-2">Fields</h2>
+      <form method="post" class="flex gap-4 flex-wrap items-end">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button class="btn btn-primary" type="submit">Update</button>
+      </form>
+      <a class="btn mt-6" href="{% url "contacts:list_custom_fields" %}">Create new fields</a>
+    </div>
+  </div>
 
 
 {% endblock %}
