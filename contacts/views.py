@@ -1,4 +1,5 @@
 import datetime
+import pickle
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,7 +23,12 @@ from django.views.generic.edit import (
 from django.views.generic.list import ListView
 
 from commons.views import FilterMixin
-from contacts.filters import ContactFilter, CustomFieldFilter, SegmentFilter
+from contacts.filters import (
+    ContactFilter,
+    CustomFieldFilter,
+    ExportContactFilters,
+    SegmentFilter,
+)
 from contacts.forms import (
     ContactForm,
     CustomFieldForm,
@@ -96,6 +102,7 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
             | {"Creation date": None, "Last update date": None, "Updated by": None}
         )
         context["create_form"] = ContactForm(request=self.request)
+        context["export_filters"] = ExportContactFilters()
         context["stats_total_contacts"] = context["filter"].qs.count()
         last_30_days = datetime.datetime.now() - datetime.timedelta(days=30)
         last_7_days = datetime.datetime.now() - datetime.timedelta(days=7)
@@ -153,6 +160,24 @@ class DeleteContact(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     model = Contact
     success_url = reverse_lazy("contacts:list_contacts")
     success_message = "Contact deleted successfully."
+
+
+class ExportContacts(SuccessMessageMixin, LoginRequiredMixin, FormView):
+    """View used to export Contacts."""
+
+    form_class = ExportContactFilters
+    success_message = "Export file is being generated..."
+    success_url = reverse_lazy("contacts:list_contacts")
+
+    def form_valid(self, form):
+        """Override 'form_valid()' to update the user JSONField() accordingly."""
+        from contacts.tasks import generate_export_task
+
+        cleaned_dates = {
+            k: v.strftime("%Y-%m-%d") for k, v in form.cleaned_data.items() if isinstance(v, datetime.date)
+        }
+        generate_export_task.delay("contact", "contacts", belongs_to=self.request.user.company.id, **cleaned_dates)
+        return super().form_valid(form)
 
 
 class ListCustomField(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView):

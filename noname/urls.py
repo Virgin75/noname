@@ -30,3 +30,4 @@ urlpatterns = (
     if settings.ENV == "local"
     else []
 )
+urlpatterns += [path("django-rq/", include("django_rq.urls"))]

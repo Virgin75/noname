@@ -1,8 +1,8 @@
-
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from commons.managers import ContactExportManager
 from commons.models import HistoryMixin
 
 
@@ -16,8 +16,10 @@ class Contact(HistoryMixin):
     email = models.EmailField()
     belongs_to = models.ForeignKey("users.Company", on_delete=models.CASCADE, null=True, blank=True)
     fields = models.JSONField(default=dict)
-    is_unsubscribed = models.BooleanField(default=False)
+    is_unsubscribed = models.BooleanField(default=False, db_index=True)
     unsubscribed_date = models.DateTimeField(null=True, blank=True)
+
+    objects = ContactExportManager()
 
     def __str__(self):
         return self.email

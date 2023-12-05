@@ -5,6 +5,7 @@ APP_VERSION = "0.0.1"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+EXPORT_ROOT = os.path.join(BASE_DIR, "exports")
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     "users",
     "contacts",
     "django.forms",
+    "django_rq",
 ]
 if os.getenv("env") == "local":
     INSTALLED_APPS.append("django_browser_reload")
@@ -65,9 +67,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
-            "libraries": {
-                "get_app_version": "commons.templatetags.get_app_version",
-            },
         },
     },
 ]
@@ -145,3 +144,58 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 TAILWIND_APP_NAME = "theme"
 INTERNAL_IPS = ["127.0.0.1"]
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
+# Redis
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "password")
+
+RQ_QUEUES = {
+    "default": {
+        "HOST": REDIS_HOST,
+        "PORT": REDIS_PORT,
+        "DB": 0,
+        "PASSWORD": REDIS_PASSWORD,
+        "DEFAULT_TIMEOUT": 360,
+    },
+    "high": {
+        "HOST": REDIS_HOST,
+        "PORT": REDIS_PORT,
+        "DB": 0,
+        "PASSWORD": REDIS_PASSWORD,
+        "DEFAULT_TIMEOUT": 360,
+    },
+    "low": {
+        "HOST": REDIS_HOST,
+        "PORT": REDIS_PORT,
+        "DB": 0,
+        "PASSWORD": REDIS_PASSWORD,
+        "DEFAULT_TIMEOUT": 360,
+    },
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "rq_console": {
+            "format": "%(asctime)s %(message)s",
+            "datefmt": "%H:%M:%S",
+        },
+    },
+    "handlers": {
+        "rq_console": {
+            "level": "INFO",
+            "class": "rq.logutils.ColorizingStreamHandler",
+            "formatter": "rq_console",
+            "exclude": ["%(asctime)s"],
+        },
+    },
+    "loggers": {
+        "rq.worker": {
+            "handlers": ["rq_console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}

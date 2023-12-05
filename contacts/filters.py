@@ -19,6 +19,11 @@ from contacts.forms import ContactForm, ContactFormFilters, CustomFieldForm, Seg
 from contacts.models import AllowedField, Contact, Segment
 
 
+class ExportContactFilters(forms.Form):
+    date_start = forms.DateField(required=False, widget=forms.DateInput(attrs={"placeholder": "Start date"}))
+    date_end = forms.DateField(required=False, widget=forms.DateInput(attrs={"placeholder": "End date"}))
+
+
 class ContactFilter(FilterSet):
     search = CharFilter(method="filter_search", widget=SearchInput(attrs={"placeholder": "Search..."}))
     search.field.group = "search"

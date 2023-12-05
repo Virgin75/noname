@@ -114,6 +114,12 @@
 <ul class="menu">
   <li>
     <a href="{% url "users:logout" %}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.97917 19.8042 4.5875 19.4125C4.19583 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z" fill="currentColor"/></svg>
+      <span class="text-base">Manage exports</span>
+    </a>
+  </li>
+  <li>
+    <a href="{% url "users:logout" %}" >
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M5 21C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H12V5H5V19H12V21H5ZM16 17L14.625 15.55L17.175 13H9V11H17.175L14.625 8.45L16 7L21 12L16 17Z" fill="currentColor"/>
       </svg>
@@ -130,6 +136,6 @@
   </li>
 </ul>
 <div class="flex flex-col items-end" style="margin-top: -20px;">
-  {% load get_app_version %}
-  <span class="text-base italic">Version {{ get_app_version }}</span>
+  {% load my_tags %}
+  <span class="text-base italic">Version {% get_app_version %}</span>
 </div>
