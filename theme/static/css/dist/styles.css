@@ -4223,8 +4223,16 @@ details.collapse summary::-webkit-details-marker {
   display: none;
 }
 
+.h-1 {
+  height: 0.25rem;
+}
+
 .h-10 {
   height: 2.5rem;
+}
+
+.h-11 {
+  height: 2.75rem;
 }
 
 .h-12 {
@@ -4251,12 +4259,8 @@ details.collapse summary::-webkit-details-marker {
   height: 100vh;
 }
 
-.h-1 {
-  height: 0.25rem;
-}
-
-.h-11 {
-  height: 2.75rem;
+.h-4 {
+  height: 1rem;
 }
 
 .w-1\/12 {
@@ -4305,6 +4309,14 @@ details.collapse summary::-webkit-details-marker {
 
 .w-full {
   width: 100%;
+}
+
+.w-4 {
+  width: 1rem;
+}
+
+.w-1 {
+  width: 0.25rem;
 }
 
 .max-w-3xl {
@@ -4839,12 +4851,44 @@ details.collapse summary::-webkit-details-marker {
   -1: -1;
 }
 
+.\[-1\:3\] {
+  -1: 3;
+}
+
+.\[-2\:-1\] {
+  -2: -1;
+}
+
+.\[-2\:2\] {
+  -2: 2;
+}
+
 .\[-2\:space\] {
   -2: space;
 }
 
 .\[-3\:-1\] {
   -3: -1;
+}
+
+.\[-4\:-1\] {
+  -4: -1;
+}
+
+.\[-4\:-2\] {
+  -4: -2;
+}
+
+.\[-5\:-2\] {
+  -5: -2;
+}
+
+.\[-5\:-4\] {
+  -5: -4;
+}
+
+.\[-6\:-1\] {
+  -6: -1;
 }
 
 .\[-7\:-4\] {
@@ -4871,6 +4915,10 @@ details.collapse summary::-webkit-details-marker {
   a: b;
 }
 
+.\[ax\:ax\+indx\.ndim\] {
+  ax: ax+indx.ndim;
+}
+
 .\[bottom\:top\] {
   bottom: top;
 }
@@ -4891,8 +4939,24 @@ details.collapse summary::-webkit-details-marker {
   cur: space;
 }
 
+.\[current\:stop\] {
+  current: stop;
+}
+
+.\[d1\:d2\] {
+  d1: d2;
+}
+
 .\[d\:\\ipython\] {
   d: \ipython;
+}
+
+.\[dt1\:dt4\] {
+  dt1: dt4;
+}
+
+.\[ellipsis_pos\:ellipsis_pos\+1\] {
+  ellipsis_pos: ellipsis pos+1;
 }
 
 .\[end\:next\] {
@@ -4911,8 +4975,36 @@ details.collapse summary::-webkit-details-marker {
   h: i;
 }
 
+.\[i\:i\+1\] {
+  i: i+1;
+}
+
+.\[i\:i\+7\] {
+  i: i+7;
+}
+
+.\[i\:i\+BLOCK\] {
+  i: i+BLOCK;
+}
+
+.\[i\:i\+lc2\] {
+  i: i+lc2;
+}
+
+.\[i\:i\+read_count\] {
+  i: i+read count;
+}
+
+.\[i\:i\+scale\] {
+  i: i+scale;
+}
+
 .\[i\:j\] {
   i: j;
+}
+
+.\[idx1\:idx2\] {
+  idx1: idx2;
 }
 
 .\[idx\:idx\+2\] {
@@ -4949,6 +5041,22 @@ details.collapse summary::-webkit-details-marker {
 
 .\[j\:chunk_end\] {
   j: chunk end;
+}
+
+.\[j\:j\+lc2\] {
+  j: j+lc2;
+}
+
+.\[k1\:k2\] {
+  k1: k2;
+}
+
+.\[k\:k\+n\+1\] {
+  k: k+n+1;
+}
+
+.\[k\:k\+n\] {
+  k: k+n;
 }
 
 .\[labelStart\:labelEnd\] {
@@ -5007,6 +5115,10 @@ details.collapse summary::-webkit-details-marker {
   mem: pos;
 }
 
+.\[middle\:end\] {
+  middle: end;
+}
+
 .\[model_fields_start\:model_fields_end\] {
   model_fields_start: model fields end;
 }
@@ -5029,6 +5141,18 @@ details.collapse summary::-webkit-details-marker {
 
 .\[offset\:next_offset\] {
   offset: next offset;
+}
+
+.\[offset\:offset\+N\*d\.nbytes\] {
+  offset: offset+N*d.nbytes;
+}
+
+.\[offset\:offset\+size\+1\] {
+  offset: offset+size+1;
+}
+
+.\[offset_items\:offset_items\+count_items\] {
+  offset_items: offset items+count items;
 }
 
 .\[oldpos\:newpos\] {
@@ -5087,6 +5211,10 @@ details.collapse summary::-webkit-details-marker {
   prev: curr;
 }
 
+.\[prev\:k\] {
+  prev: k;
+}
+
 .\[prev_col\:start_col\] {
   prev_col: start col;
 }
@@ -5115,6 +5243,34 @@ details.collapse summary::-webkit-details-marker {
   s: e;
 }
 
+.\[s\:s\+4\] {
+  s: s+4;
+}
+
+.\[s\:s\+8\] {
+  s: s+8;
+}
+
+.\[s\:s\+scale\] {
+  s: s+scale;
+}
+
+.\[six\:eix\] {
+  six: eix;
+}
+
+.\[st\:end\] {
+  st: end;
+}
+
+.\[start\:\"2022\"\] {
+  start: "2022";
+}
+
+.\[start\:edge\] {
+  start: edge;
+}
+
 .\[start\:end\] {
   start: end;
 }
@@ -5139,8 +5295,16 @@ details.collapse summary::-webkit-details-marker {
   start: stop;
 }
 
+.\[start_i\:end_i\] {
+  start_i: end i;
+}
+
 .\[start_idx\:end_idx\] {
   start_idx: end idx;
+}
+
+.\[start_pos\:end_pos\] {
+  start_pos: end pos;
 }
 
 .\[start_pos\:pos\] {
@@ -5155,12 +5319,20 @@ details.collapse summary::-webkit-details-marker {
   string_start: string end;
 }
 
+.\[t_1\:t_2\] {
+  t_1: t 2;
+}
+
 .\[text_start\:completion_start\] {
   text_start: completion start;
 }
 
 .\[top\:bottom\] {
   top: bottom;
+}
+
+.\[tzname_offset\:nul\] {
+  tzname_offset: nul;
 }
 
 .\[upto\:next\] {
@@ -5175,172 +5347,12 @@ details.collapse summary::-webkit-details-marker {
   user: passwd@;
 }
 
-.\[tzname_offset\:nul\] {
-  tzname_offset: nul;
-}
-
-.\[-2\:-1\] {
-  -2: -1;
-}
-
-.\[i\:i\+7\] {
-  i: i+7;
-}
-
-.\[i\:i\+BLOCK\] {
-  i: i+BLOCK;
-}
-
-.\[i\:i\+read_count\] {
-  i: i+read count;
-}
-
-.\[k1\:k2\] {
-  k1: k2;
-}
-
-.\[k\:k\+n\+1\] {
-  k: k+n+1;
-}
-
-.\[st\:end\] {
-  st: end;
-}
-
-.\[start_pos\:end_pos\] {
-  start_pos: end pos;
-}
-
-.\[ax\:ax\+indx\.ndim\] {
-  ax: ax+indx.ndim;
-}
-
-.\[ellipsis_pos\:ellipsis_pos\+1\] {
-  ellipsis_pos: ellipsis pos+1;
-}
-
-.\[i\:i\+1\] {
-  i: i+1;
-}
-
-.\[i\:i\+lc2\] {
-  i: i+lc2;
-}
-
-.\[i\:i\+scale\] {
-  i: i+scale;
-}
-
-.\[j\:j\+lc2\] {
-  j: j+lc2;
-}
-
-.\[k\:k\+n\] {
-  k: k+n;
-}
-
-.\[offset\:offset\+N\*d\.nbytes\] {
-  offset: offset+N*d.nbytes;
-}
-
-.\[offset\:offset\+size\+1\] {
-  offset: offset+size+1;
-}
-
-.\[offset_items\:offset_items\+count_items\] {
-  offset_items: offset items+count items;
-}
-
-.\[prev\:k\] {
-  prev: k;
-}
-
-.\[s\:s\+4\] {
-  s: s+4;
-}
-
-.\[s\:s\+8\] {
-  s: s+8;
-}
-
-.\[s\:s\+scale\] {
-  s: s+scale;
-}
-
 .\[val1\:val2\] {
   val1: val2;
 }
 
-.\[-4\:-1\] {
-  -4: -1;
-}
-
-.\[current\:stop\] {
-  current: stop;
-}
-
-.\[start_i\:end_i\] {
-  start_i: end i;
-}
-
-.\[-4\:-2\] {
-  -4: -2;
-}
-
-.\[-5\:-2\] {
-  -5: -2;
-}
-
-.\[-6\:-1\] {
-  -6: -1;
-}
-
-.\[d1\:d2\] {
-  d1: d2;
-}
-
-.\[middle\:end\] {
-  middle: end;
-}
-
-.\[six\:eix\] {
-  six: eix;
-}
-
-.\[start\:\"2022\"\] {
-  start: "2022";
-}
-
-.\[start\:edge\] {
-  start: edge;
-}
-
-.\[t_1\:t_2\] {
-  t_1: t 2;
-}
-
 .\[value\:\"third\"\] {
   value: "third";
-}
-
-.\[-1\:3\] {
-  -1: 3;
-}
-
-.\[-2\:2\] {
-  -2: 2;
-}
-
-.\[-5\:-4\] {
-  -5: -4;
-}
-
-.\[dt1\:dt4\] {
-  dt1: dt4;
-}
-
-.\[idx1\:idx2\] {
-  idx1: idx2;
 }
 
 .heading-1 {

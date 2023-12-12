@@ -1,9 +1,15 @@
 {% if value == 'str' %}
-    <div class="badge badge-primary">{{ value }}</div>
+    <div class="badge badge-primary">{{ value|capfirst }}</div>
 {% elif value == 'number' %}
-    <div class="badge badge-secondary">{{ value }}</div>
+    <div class="badge badge-secondary">{{ value|capfirst }}</div>
 {% elif value == 'date' %}
-    <div class="badge badge-neutral">{{ value }}</div>
+    <div class="badge badge-neutral">{{ value|capfirst }}</div>
+{% elif value == 'completed' %}
+    <div class="badge badge-success">{{ value|capfirst }}</div>
+{% elif value == 'running' %}
+    <div class="badge badge-neutral">{{ value|capfirst }}</div>
+{% elif value == 'failed' %}
+    <div class="badge badge-error">{{ value|capfirst }}</div>
 {% else %}
-    <div class="badge badge-accent">{{ value }}</div>
+    <div class="badge badge-accent">{{ value|capfirst }}</div>
 {% endif %}

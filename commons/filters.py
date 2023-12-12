@@ -1,5 +1,14 @@
 from django.forms import IntegerField, ModelForm
-from django_filters import NumberFilter
+from django_filters import (
+    CharFilter,
+    ChoiceFilter,
+    FilterSet,
+    NumberFilter,
+    OrderingFilter,
+)
+
+from commons.fields import SearchInput
+from commons.models import ExportLog
 
 
 class FilteredModelForm(ModelForm):
@@ -23,3 +32,23 @@ class IntegerFilter(NumberFilter):
     """Override default DecimalField to IntegerField."""
 
     field_class = IntegerField
+
+
+class ExportForm(FilteredModelForm):
+    class Meta:
+        model = ExportLog
+        exclude = ["belongs_to"]
+
+
+class ExportFilter(FilterSet):
+    file_name = CharFilter(lookup_expr="icontains", widget=SearchInput(attrs={"placeholder": "Search..."}))
+    file_name.field.group = "search"
+    status = ChoiceFilter(choices=ExportLog.STATUS, lookup_expr="exact")
+    status.field.group = "filters"
+    order_by = OrderingFilter(fields=[("id", "Creation date"), ("type", "Type"), ("file_name", "File name")])
+    order_by.field.group = "sort"
+
+    class Meta:
+        model = ExportLog
+        fields = ["file_name", "type", "status", "total_rows", "total_columns", "user"]
+        form = ExportForm
