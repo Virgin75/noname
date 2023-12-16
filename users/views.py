@@ -88,3 +88,20 @@ class UpdateCompanyView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
+
+
+class UpdateAccountView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
+    """View used to update the user's Account details."""
+
+    template_name = "users/update_account.html"
+    success_message = "Your profile was updated successfully."
+    success_url = reverse_lazy("users:update_account")
+    form_class = UserRegisterForm
+
+    def get_object(self, **kwargs):
+        return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs

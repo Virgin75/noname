@@ -5,6 +5,7 @@ from users.views import (
     LoginView,
     LogoutView,
     SignUpView,
+    UpdateAccountView,
     UpdateCompanyView,
 )
 
@@ -14,4 +15,5 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("create-company/", CreateCompanyView.as_view(), name="create_company"),
     path("update-company/", UpdateCompanyView.as_view(), name="update_company"),
+    path("update-account/", UpdateAccountView.as_view(), name="update_account"),
 ]

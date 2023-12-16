@@ -39,7 +39,7 @@ def generate_export_task(model: str, app: str, user_id: int, task_log_id: int = 
         logger.info(f" 🏁 Starting 'generate_export_task' for task: '{log.id}'...")
         extra_filters = {k: v for k, v in kwargs.items() if k not in ("task_log_id")}
         ModelClass = apps.get_model(model_name=model, app_label=app)  # noqa
-        queryset = ModelClass.objects.export(**extra_filters)
+        queryset = ModelClass.objects.expo8rt(**extra_filters)
 
         # Convert queryset to pandas dataframe and save to csv
         df = pd.DataFrame(queryset)
