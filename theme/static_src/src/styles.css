@@ -23,7 +23,9 @@
   }
 @tailwind components;
 @tailwind utilities;
-
+html {
+    font-size: max(12px, 0.85vw);
+}
 .heading-1 {
     @apply text-4xl;
     @apply font-bold;
