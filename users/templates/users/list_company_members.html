@@ -1,0 +1,47 @@
+{% extends "commons/base.html" %}
+{% block title %}Company details{% endblock %}
+{% block content %}
+    <div id="page-content" class="flex flex-col gap-5">
+        <div class="flex flex-wrap gap-5">
+            <div class="flex flex-row gap-4 items-center">
+<svg class="fill-primary w-12 h-12" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 18V4H4V0H14V8H18V18H10V14H8V18H0ZM2 16H4V14H2V16ZM2 12H4V10H2V12ZM2 8H4V6H2V8ZM6 12H8V10H6V12ZM6 8H8V6H6V8ZM6 4H8V2H6V4ZM10 12H12V10H10V12ZM10 8H12V6H10V8ZM10 4H12V2H10V4ZM14 16H16V14H14V16ZM14 12H16V10H14V12Z"/>
+</svg>
+                <h1 class="heading-1">{{ company.name|capfirst }}</h1>
+            </div>
+        </div>
+        <p class="text max-w-3xl mb-2">Edit your company details or invite new members to your company.</p>
+    <div role="tablist" class="tabs tabs-boxed mb-4 bg-base-100 py-2 px-2 font-bold" style="width: fit-content;">
+      <a role="tab" href="{% url "users:update_company" %}" class="tab text-current text-sm">Company details</a>
+      <a role="tab" href="{% url "users:company_members" %}" class="tab tab-active text-sm">Members</a>
+    </div>
+    <div class="flex bg-base-100 flex-grow rounded-2xl">
+                <div class="overflow-x-auto w-full rounded-2xl shadow-sm">
+                    <table class="table table-zebra table-pin-rows table-pin-cols">
+                <!-- head -->
+                        <thead>
+                            <tr>
+                                {% for field in fields %}
+                                    <th><b>{{field}}</b></th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for obj in object_list %}
+                                <td>{{ obj.id }}</td>
+                                <td>{{ obj.first_name|capfirst }} {{ obj.last_name|capfirst }}</td>
+                                <td>{{ obj.email }}</td>
+                                <td style="min-width: 230px;">{% include "commons/display_as_date.html" with value=obj.created_at|default:""%}</td>
+                                <td style="min-width: 230px;"><a class="btn btn-sm" href="#"><svg width="1rem" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 15C13.4167 15 13.7708 14.8542 14.0625 14.5625C14.3542 14.2708 14.5 13.9167 14.5 13.5C14.5 13.0833 14.3542 12.7292 14.0625 12.4375C13.7708 12.1458 13.4167 12 13 12C12.5833 12 12.2292 12.1458 11.9375 12.4375C11.6458 12.7292 11.5 13.0833 11.5 13.5C11.5 13.9167 11.6458 14.2708 11.9375 14.5625C12.2292 14.8542 12.5833 15 13 15ZM13 18C13.5167 18 13.9917 17.8792 14.425 17.6375C14.8583 17.3958 15.2083 17.075 15.475 16.675C15.1083 16.4583 14.7167 16.2917 14.3 16.175C13.8833 16.0583 13.45 16 13 16C12.55 16 12.1167 16.0583 11.7 16.175C11.2833 16.2917 10.8917 16.4583 10.525 16.675C10.7917 17.075 11.1417 17.3958 11.575 17.6375C12.0083 17.8792 12.4833 18 13 18ZM8 20C5.68333 19.4167 3.77083 18.0875 2.2625 16.0125C0.754167 13.9375 0 11.6333 0 9.1V3L8 0L16 3V8.675C15.6833 8.54167 15.3583 8.42083 15.025 8.3125C14.6917 8.20417 14.35 8.125 14 8.075V4.4L8 2.15L2 4.4V9.1C2 9.88333 2.10417 10.6667 2.3125 11.45C2.52083 12.2333 2.8125 12.9792 3.1875 13.6875C3.5625 14.3958 4.01667 15.05 4.55 15.65C5.08333 16.25 5.675 16.75 6.325 17.15C6.50833 17.6833 6.75 18.1917 7.05 18.675C7.35 19.1583 7.69167 19.5917 8.075 19.975C8.05833 19.975 8.04583 19.9792 8.0375 19.9875C8.02917 19.9958 8.01667 20 8 20ZM13 20C11.6167 20 10.4375 19.5125 9.4625 18.5375C8.4875 17.5625 8 16.3833 8 15C8 13.6167 8.4875 12.4375 9.4625 11.4625C10.4375 10.4875 11.6167 10 13 10C14.3833 10 15.5625 10.4875 16.5375 11.4625C17.5125 12.4375 18 13.6167 18 15C18 16.3833 17.5125 17.5625 16.5375 18.5375C15.5625 19.5125 14.3833 20 13 20Z" fill="currentColor"/>
+</svg>
+display permissions</a></td>
+                                <th><a onclick="delete_modal_{{ obj.id }}.showModal()"><div class="tooltip tooltip-left" data-tip="Remove user from your company"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 21C6.45 21 5.97917 20.8042 5.5875 20.4125C5.19583 20.0208 5 19.55 5 19V6H4V4H9V3H15V4H20V6H19V19C19 19.55 18.8042 20.0208 18.4125 20.4125C18.0208 20.8042 17.55 21 17 21H7ZM17 6H7V19H17V6ZM9 17H11V8H9V17ZM13 17H15V8H13V17Z" fill="currentColor"/></svg></div></a>
+</th>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+{% endblock %}

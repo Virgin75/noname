@@ -6,7 +6,7 @@ from users.views import (
     LogoutView,
     SignUpView,
     UpdateAccountView,
-    UpdateCompanyView,
+    UpdateCompanyView, ListCompanyMembersView,
 )
 
 urlpatterns = [
@@ -15,5 +15,6 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("create-company/", CreateCompanyView.as_view(), name="create_company"),
     path("update-company/", UpdateCompanyView.as_view(), name="update_company"),
+    path("company-members/", ListCompanyMembersView.as_view(), name="company_members"),
     path("update-account/", UpdateAccountView.as_view(), name="update_account"),
 ]

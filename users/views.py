@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import BaseUpdateView, CreateView, FormView, UpdateView
 
 from users.forms import AuthForm, CompanyForm, UserRegisterForm
@@ -88,6 +88,23 @@ class UpdateCompanyView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
+
+
+class ListCompanyMembersView(ListView, LoginRequiredMixin):
+    """View used to retrieve all the Company members."""
+    template_name = "users/list_company_members.html"
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Account.objects.filter(company=self.request.user.company).order_by("-id")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["company"] = self.request.user.company
+        context["fields"] = ["", "Name", "Email", "Creation date", "Permissions", ""]
+        print(context)
+        return context
+
 
 
 class UpdateAccountView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):

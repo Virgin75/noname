@@ -1,10 +1,24 @@
 {% extends "commons/base.html" %}
-{% block title %}Edit your company details:{% endblock %}
+{% block title %}Company details{% endblock %}
 {% block content %}
-  <h2>Edit your company details:</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Validate</button>
-  </form>
+    <div id="page-content" class="flex flex-col gap-5">
+        <div class="flex flex-wrap gap-5">
+            <div class="flex flex-row gap-4 items-center">
+<svg class="fill-primary w-12 h-12" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 18V4H4V0H14V8H18V18H10V14H8V18H0ZM2 16H4V14H2V16ZM2 12H4V10H2V12ZM2 8H4V6H2V8ZM6 12H8V10H6V12ZM6 8H8V6H6V8ZM6 4H8V2H6V4ZM10 12H12V10H10V12ZM10 8H12V6H10V8ZM10 4H12V2H10V4ZM14 16H16V14H14V16ZM14 12H16V10H14V12Z"/>
+</svg>
+                <h1 class="heading-1">{{ object.name|capfirst }}</h1>
+            </div>
+        </div>
+        <p class="text max-w-3xl mb-2">Edit your company details or invite new members to your company.</p>
+    <div role="tablist" class="tabs tabs-boxed mb-4 bg-base-100 py-2 px-2 font-bold" style="width: fit-content;">
+      <a role="tab" href="{% url "users:update_company" %}" class="tab tab-active text-sm">Company details</a>
+      <a role="tab" href="{% url "users:company_members" %}" class="tab text-current text-sm">Members</a>
+    </div>
+    <form method="post" class="flex flex-wrap items-end gap-3 w-7/12 p-8 bg-base-100 rounded-2xl">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <input type="submit" value="Update" class="btn btn-primary items-end">
+    </form>
+    </div>
 {% endblock %}

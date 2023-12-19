@@ -31,14 +31,14 @@
       </svg></label>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li><a href="{% url "users:update_account" %}">Profile settings</a></li>
-        <li><a>Company settings</a></li>
+        <li><a href="{% url "users:update_company" %}">Company settings</a></li>
       </ul>
     </div>
 
   </div>
 
 </div>
-<ul class="menu bg-base-100 lg:menu-horizontal rounded-box gap-3">
+<ul class="menu bg-base-100 lg:menu-horizontal rounded-box gap-2">
   <li>
     <a href="{{ dashboard_url }}" class="{% if request.path == dashboard_url %}bg-primary dark:text-white light:text-base100{% else %}{% endif %}">
       <svg width="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -111,14 +111,16 @@
     </details>
   </li>
 </ul>
-<div class="divider mt-auto" style="margin-bottom: -20px"></div>
-<ul class="menu">
+<ul class="menu mt-auto">
   <li>
     <a href="{{ list_exports_url }}" class="{% if request.path == list_exports_url %}bg-primary dark:text-white light:text-base100{% endif %}">
       <svg width="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.97917 19.8042 4.5875 19.4125C4.19583 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z" fill="currentColor"/></svg>
       <span class="text-base">Manage exports</span>
     </a>
   </li>
+</ul>
+<div class="divider" style="margin-bottom: -20px; margin-top: -20px;"></div>
+<ul class="menu">
   <li>
     <a href="{% url "users:logout" %}" >
       <svg width="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
