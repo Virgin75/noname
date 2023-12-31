@@ -2,11 +2,12 @@ from django.urls import path
 
 from users.views import (
     CreateCompanyView,
+    ListCompanyMembersView,
     LoginView,
     LogoutView,
     SignUpView,
     UpdateAccountView,
-    UpdateCompanyView, ListCompanyMembersView,
+    UpdateCompanyView,
 )
 
 urlpatterns = [

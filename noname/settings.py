@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "noname.apps.MainAppConfig",
     "tailwind",
     "theme",
     "django_filters",
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.forms",
     "django_rq",
 ]
+PLUGIN_APPS = []
 if os.getenv("env") == "local":
     INSTALLED_APPS.append("django_browser_reload")
 
@@ -198,4 +200,11 @@ LOGGING = {
             "propagate": True,
         },
     },
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}",
+    }
 }
