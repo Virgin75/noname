@@ -1,3 +1,0 @@
-,id,email,created_at,updated_at,updated_by,is_unsubscribed,unsubscribed_date,age,first_name,last_name,hobbies
-0,16,virgin@gmail.com,2023-11-27 19:06:16.994024+00:00,2023-11-28 18:23:57.448984+00:00,8,True,2023-11-27 00:00:00+00:00,22,Virgin,Bitton,
-1,17,lolo@hj.fr,2023-11-27 20:34:12.656994+00:00,2023-11-27 20:44:47.090306+00:00,8,False,2023-11-27 20:44:12.555269+00:00,,,,
