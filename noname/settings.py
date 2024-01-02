@@ -19,6 +19,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+if os.environ.get("NPM_BIN_PATH", None):
+    NPM_BIN_PATH = os.environ.get("NPM_BIN_PATH")
 
 # Application definition
 
