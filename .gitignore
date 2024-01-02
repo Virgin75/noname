@@ -3,9 +3,11 @@ venv
 venv/*
 .idea
 .idea/*
-__pycache__/
-*/__pycache__/
-*/*/__pycache__/
+__pycache__/*.pyc
+*/__pycache__/*.pyc
+*/*/__pycache__/*.pyc
+*.pyc
+*.py[cod]
 node_modules/
 exports
 exports/
