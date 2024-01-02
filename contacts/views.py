@@ -341,13 +341,13 @@ class UpdateSegmentView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         return TemplateResponse(request, self.template_name, context)
 
     def get_form_kwargs(self):
-        """Override 'get_form_kwargs()' to pass the request data to the form."""
+        """Pass the request data to the form."""
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
 
     def form_valid(self, form):
-        """Override 'form_valid()' to update the user JSONField() accordingly."""
+        """Update the user's `JSONField()` accordingly."""
         contact = form.save(commit=False)
         contact.updated_by = self.request.user
         contact.save()

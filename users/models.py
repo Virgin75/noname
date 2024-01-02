@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Permission
+from django.contrib.auth.models import AbstractBaseUser, Permission, PermissionsMixin
 from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
@@ -10,6 +10,13 @@ from users.managers import CustomUserManager
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
+    """User model used in the app: stores basic information about the user (first name, last name...).
+
+    Nice to know:
+    - Each user must belong to a Company (and only one).
+    - Two users can't have the same email address (identifier field).
+    """
+
     class Meta:
         verbose_name_plural = "Users"
 
@@ -41,7 +48,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         if not perms:
             group_perms = ["contacts", "pages", "products", "emails"] + settings.PLUGIN_APPS
             perms_choices = {
-                group: [{f"{group}_{perm}": False} for perm in ('read_only_access', 'full_access')]
+                group: [{f"{group}_{perm}": False} for perm in ("read_only_access", "full_access")]
                 for group in group_perms
             }
             perms_choices["extra"] = [{"extra_can_export": False}, {"extra_company_admin": False}]
@@ -54,11 +61,17 @@ class Account(AbstractBaseUser, PermissionsMixin):
             cache.set(f"perms_{self.id}", perms_choices, 60 * 60)
             return perms_choices
 
-    def __str__(self):
-        return self.email
-
 
 class Company(models.Model):
+    """A Company is an entity gathering users together.
+
+    Every user has a single Company. A company can have multiple users.
+
+    This table stores basic information about the company (name, address...).
+    💡 Throughout the app, the Company is used to filter data the user has access to. Most
+     of the others tables in db have a foreign key to Company.
+    """
+
     name = models.CharField(max_length=80, unique=True)
     address = models.CharField(max_length=80, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
@@ -70,8 +83,6 @@ class Company(models.Model):
         verbose_name_plural = "Companies"
 
     @property
-    def slug_name(self):
+    def slug_name(self) -> str:
+        """Returns the slugified name of the company (only characters that are accepted in URL or file names)."""
         return slugify(self.name)
-
-    def __str__(self):
-        return self.name

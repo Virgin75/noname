@@ -36,47 +36,47 @@
                                 <div class="modal-box h-1/2 flex flex-col gap-4">
                                     <h3 class="font-bold text-lg">Edit {{ obj.email }}'s permissions</h3>
                                     <div class="overflow-x-auto">
-                                      <table class="table ">
-                                          {% for group, perms in obj.get_app_permissions.items %}
-                                              <thead>
-                                                <tr>
-                                                  <th class="text-sm">{{ group|capfirst }}</th>
-                                                </tr>
-                                              </thead>
-                                              <tbody class="bg-base-200 rounded-2xl">
-                                              {% if group != "extra" %}
-                                                <tr>
-                                                    <td>No access to this feature</td>
-                                                    <td>
-                                                        <div>
-                                                           <input type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="" name="{{ group }}" value="" checked/>
-                                                           <label for="{{ id }}"></label>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                {% endif %}
-                                                {% for perm in perms %}
+                                        <table class="table ">
+                                            {% for group, perms in obj.get_app_permissions.items %}
+                                                <thead>
                                                     <tr>
-                                                        {% for key, value in perm.items %}
-                                                          {%  if "full_access" in key %}
-                                                             <td>Full access</td>
-                                                          {%  elif "read_only" in key %}
-                                                             <td>Read-only access</td>
-                                                          {%  else %}
-                                                             <td>{{ key }}</td>
-                                                          {%  endif %}
-                                                      <td>
-                                                        <div>
-                                                           <input type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="{{ key }}" name="{{ group }}" value="{{ key }}" {% if value %}checked{% endif %}/>
-                                                           <label for="{{ id }}"></label>
-                                                        </div>
-                                                      </td>
-                                                    {% endfor %}
+                                                        <th class="text-sm">{{ group|capfirst }}</th>
                                                     </tr>
-                                                {% endfor %}
-                                              </tbody>
-                                          {% endfor %}
-                                      </table>
+                                                </thead>
+                                                <tbody class="bg-base-200 rounded-2xl">
+                                                    {% if group != "extra" %}
+                                                        <tr>
+                                                            <td>No access to this feature</td>
+                                                            <td>
+                                                                <div>
+                                                                    <input type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="" name="{{ group }}" value="" checked/>
+                                                                    <label for="{{ id }}"></label>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% for perm in perms %}
+                                                        <tr>
+                                                            {% for key, value in perm.items %}
+                                                                {%  if "full_access" in key %}
+                                                                    <td>Full access</td>
+                                                                {%  elif "read_only" in key %}
+                                                                    <td>Read-only access</td>
+                                                                {%  else %}
+                                                                    <td>{{ key }}</td>
+                                                                {%  endif %}
+                                                                <td>
+                                                                    <div>
+                                                                        <input type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="{{ key }}" name="{{ group }}" value="{{ key }}" {% if value %}checked{% endif %}/>
+                                                                        <label for="{{ id }}"></label>
+                                                                    </div>
+                                                                </td>
+                                                            {% endfor %}
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            {% endfor %}
+                                        </table>
                                     </div>
                                 </div>
                                 <form method="dialog" class="modal-backdrop">

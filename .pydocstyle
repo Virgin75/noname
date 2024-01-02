@@ -1,4 +1,4 @@
 [pydocstyle]
 match = (?!__init__).*\.py
 match_dir = ^(?!(venv|migrations)).*
-ignore = D106,D107,D100,D105
+ignore = D106,D107,D100,D105,D203,D213,D212,D406,D407,D412,D413
