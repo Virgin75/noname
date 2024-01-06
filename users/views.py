@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView
@@ -143,3 +144,13 @@ class UpdateAccountView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
+
+
+class AddUserPermissionView(UpdateView, LoginRequiredMixin):
+    """View used to add a permission to a user (HTMX)."""
+
+    def post(self, request, *args, **kwargs):
+        """Add the permission to the user and return the updated user's permissions."""
+        user = Account.objects.get(id=kwargs.get("user_id"))
+        print(request.POST)
+        return HttpResponse("hello there")

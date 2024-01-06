@@ -8,6 +8,7 @@ from users.views import (
     SignUpView,
     UpdateAccountView,
     UpdateCompanyView,
+    AddUserPermissionView
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("update-company/", UpdateCompanyView.as_view(), name="update_company"),
     path("company-members/", ListCompanyMembersView.as_view(), name="company_members"),
     path("update-account/", UpdateAccountView.as_view(), name="update_account"),
+    path("add-permission/<int:user_id>/", AddUserPermissionView.as_view(), name="add_user_permission"),
 ]
