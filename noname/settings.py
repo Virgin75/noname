@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    "noname.apps.MainAppConfig",
     "tailwind",
     "theme",
     "django_filters",
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "contacts",
     "django.forms",
     "django_rq",
+    "noname.apps.MainAppConfig",
 ]
 PLUGIN_APPS = []
 if os.getenv("env") == "local":
