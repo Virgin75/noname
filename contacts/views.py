@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.fields.json import KT
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, Template
@@ -118,7 +118,8 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
             context["filter"].qs.filter(created_at__range=(today_min, today_max)).values("id").count()
         )
         context["stats_contacts_status"] = context["filter"].qs.aggregate(
-            count_unsub=Count("id") - Count("is_unsubscribed"), count_sub=Count("is_unsubscribed")
+            count_unsub=Count("id", filter=Q(is_unsubscribed=None) | Q(is_unsubscribed=False)),
+            count_sub=Count("is_unsubscribed", filter=Q(is_unsubscribed=True)),
         )
         return context
 
