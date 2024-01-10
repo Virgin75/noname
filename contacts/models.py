@@ -31,9 +31,6 @@ class Contact(HistoryMixin):
         super().save(force_insert, force_update, using, update_fields)
 
 
-
-
-
 class AllowedField(models.Model):
     """
     List of fields that can be used in the 'fields' attribute of a Contact (per Company).

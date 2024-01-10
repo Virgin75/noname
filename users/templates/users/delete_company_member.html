@@ -1,0 +1,19 @@
+<dialog id="delete_modal_{{ obj.id }}" class="modal">
+  <div class="modal-box">
+    <p>Are you sure you want to remove <b> {{ obj.email }}</b> from your company?</p>
+    <div class="flex flex-row justify-end items-end gap-2">
+      <form method="post" action="{% url "users:delete_company_member" obj.id %}">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="btn btn-primary mt-5">
+          Confirm deletion
+        </button>
+      </form>
+      <form method="dialog">
+        <button class="btn">Cancel</button>
+      </form>
+    </div>
+
+  </div>
+</dialog>

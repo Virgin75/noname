@@ -2,6 +2,7 @@
 {% block title %}Company details{% endblock %}
 {% block content %}
     <script src="https://unpkg.com/htmx.org@1.2.1"></script>
+    {% include "users/create_user_into_company.html" %}
     <div id="page-content" class="flex flex-col gap-5">
         <div class="flex flex-wrap gap-5">
             <div class="flex flex-row gap-4 items-center">
@@ -10,12 +11,25 @@
                 </svg>
                 <h1 class="heading-1">{{ company.name|capfirst }}</h1>
             </div>
+            <button class="btn btn-primary ml-auto" onclick="create_modal.showModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 13H5V11H11V5H13V11H19V13H13V19H11V13Z" fill="currentColor"/></svg>
+                INVITE NEW USER
+            </button>
         </div>
         <p class="text max-w-3xl mb-2">Edit your company details or invite new members to your company.</p>
         <div role="tablist" class="tabs tabs-boxed mb-4 bg-base-100 py-2 px-2 font-bold" style="width: fit-content;">
             <a role="tab" href="{% url "users:update_company" %}" class="tab text-current text-sm">Company details</a>
             <a role="tab" href="{% url "users:company_members" %}" class="tab tab-active text-sm">Members</a>
         </div>
+        {% if invited_user_reset_token %}
+            <div class="flex bg-success/20 rounded-2xl shadow-sm p-6 items-center">
+                <div class="flex flex-col">
+                    <p>Please send the following link to the new user to let him/her generate his/her password:</p>
+                    <p id="link-success-add" class="text-green-600 hidden text-left">Link copied to clipboard.</p>
+                </div>
+                <a onclick="copyToClipboardAdd()" class="btn ml-auto "><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 19.925L11.25 15.675L12.65 14.275L15.5 17.125L21.15 11.475L22.55 12.875L15.5 19.925ZM21 10H19V5H17V8H7V5H5V19H11V21H5C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H9.175C9.35833 2.41667 9.71667 1.9375 10.25 1.5625C10.7833 1.1875 11.3667 1 12 1C12.6667 1 13.2625 1.1875 13.7875 1.5625C14.3125 1.9375 14.6667 2.41667 14.85 3H19C19.55 3 20.0208 3.19583 20.4125 3.5875C20.8042 3.97917 21 4.45 21 5V10ZM12 5C12.2833 5 12.5208 4.90417 12.7125 4.7125C12.9042 4.52083 13 4.28333 13 4C13 3.71667 12.9042 3.47917 12.7125 3.2875C12.5208 3.09583 12.2833 3 12 3C11.7167 3 11.4792 3.09583 11.2875 3.2875C11.0958 3.47917 11 3.71667 11 4C11 4.28333 11.0958 4.52083 11.2875 4.7125C11.4792 4.90417 11.7167 5 12 5Z" fill="currentColor"/></svg>Copy password generation link to clipboard</a>
+            </div>
+        {% endif %}
         <div class="flex bg-base-100 flex-grow rounded-2xl">
             <div class="overflow-x-auto w-full rounded-2xl shadow-sm">
                 <table class="table table-pin-rows table-pin-cols">
@@ -29,79 +43,92 @@
                     </thead>
                     <tbody id="table-body">
                         {% for obj in object_list %}
-                            <td>{{ obj.id }}</td>
-                            <td>{{ obj.first_name|capfirst }} {{ obj.last_name|capfirst }}</td>
-                            <td>{{ obj.email }}</td>
-                            <td style="min-width: 230px;">{% include "commons/display_as_date.html" with value=obj.created_at|default:""%}</td>
-                            <td style="min-width: 230px;"><dialog id="show_perm_user_{{ obj.id }}" class="modal">
-                                <div class="modal-box h-1/2 flex flex-col gap-4">
-                                    <div class="flex justify-between">
-                                       <h3 class="font-bold text-lg">Edit {{ obj.email }}'s permissions</h3>
-                                        <span id="spinner" class="loading loading-spinner loading-sm htmx-indicator text-primary"></span>
-                                    </div>
-                                    <div class="overflow-x-auto">
-                                        <table class="table ">
-                                            {% for group, perms in obj.get_app_permissions.items %}
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-sm">{{ group|capfirst }}</th>
-                                                        <th></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="bg-base-200 rounded-2xl">
-                                                    {% if group != "extra" %}
+                            <tr>
+                                {% include "users/get_reset_password.html" %}
+                                {% include "users/delete_company_member.html" %}
+                                <td>{{ obj.id }}</td>
+                                <td>{{ obj.first_name|capfirst }} {{ obj.last_name|capfirst }}</td>
+                                <td>{{ obj.email }}</td>
+                                <td style="min-width: 230px;">{% include "commons/display_as_date.html" with value=obj.created_at|default:""%}</td>
+                                <td style="min-width: 230px;"><dialog id="show_perm_user_{{ obj.id }}" class="modal">
+                                    <div class="modal-box h-1/2 flex flex-col gap-4">
+                                        <div class="flex justify-between">
+                                            <h3 class="font-bold text-lg">Edit {{ obj.email }}'s permissions</h3>
+                                            <span id="spinner" class="loading loading-spinner loading-sm htmx-indicator text-primary"></span>
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="table ">
+                                                {% for group, perms in obj.get_app_permissions.items %}
+                                                    <thead>
                                                         <tr>
-                                                            <td>No access to this feature</td>
-                                                            <td>
-                                                                <div>
-                                                                    <input hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="" name="{{ group }}" value="null" checked/>
-                                                                    <label for="{{ id }}"></label>
-                                                                </div>
-                                                            </td>
+                                                            <th class="text-sm">{{ group|capfirst }}</th>
+                                                            <th></th>
                                                         </tr>
-                                                    {% endif %}
-                                                    {% for perm in perms %}
-                                                        <tr>
-                                                            {% for key, value in perm.items %}
-                                                                {%  if "full_access" in key %}
-                                                                    <td>Full access</td>
-                                                                {%  elif "read_only" in key %}
-                                                                    <td>Read-only access</td>
-                                                                {%  else %}
-                                                                    <td>{{ key }}</td>
-                                                                {%  endif %}
+                                                    </thead>
+                                                    <tbody class="bg-base-200 rounded-2xl">
+                                                        {% if group != "extra" %}
+                                                            <tr>
+                                                                <td>No access to this feature</td>
                                                                 <td>
-                                                                    {% if group == "extra" %}
-                                                                        <select hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" hx-swap="none" name="{{ key }}">
-                                                                          <option value="yes" {% if value %}selected{% endif %}>Yes</option>
-                                                                          <option value="no" {% if not value %}selected{% endif %}>No</option>
-                                                                        </select>
-                                                                    {% else %}
-                                                                        <input hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" type="radio" id="{{ key }}" name="{{ group }}" value="{{ key }}" {% if value %}checked{% endif %}/>
+                                                                    <div>
+                                                                        <input hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" type="{% if group == "extra" %}checkbox{% else %}radio{% endif %}" id="" name="{{ group }}" value="null" checked/>
                                                                         <label for="{{ id }}"></label>
-                                                                    {% endif %}
+                                                                    </div>
                                                                 </td>
-                                                            {% endfor %}
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            {% endfor %}
-                                        </table>
+                                                            </tr>
+                                                        {% endif %}
+                                                        {% for perm in perms %}
+                                                            <tr>
+                                                                {% for key, value in perm.items %}
+                                                                    {%  if "full_access" in key %}
+                                                                        <td>Full access</td>
+                                                                    {%  elif "read_only" in key %}
+                                                                        <td>Read-only access</td>
+                                                                    {%  else %}
+                                                                        <td>{{ key }}</td>
+                                                                    {%  endif %}
+                                                                    <td>
+                                                                        {% if group == "extra" %}
+                                                                            <select hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" hx-swap="none" name="{{ key }}">
+                                                                                <option value="yes" {% if value %}selected{% endif %}>Yes</option>
+                                                                                <option value="no" {% if not value %}selected{% endif %}>No</option>
+                                                                            </select>
+                                                                        {% else %}
+                                                                            <input hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" type="radio" id="{{ key }}" name="{{ group }}" value="{{ key }}" {% if value %}checked{% endif %}/>
+                                                                            <label for="{{ id }}"></label>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                {% endfor %}
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                                <form method="dialog" class="modal-backdrop">
-                                    <button>close</button>
-                                </form>
-                            </dialog><button class="btn" onclick="show_perm_user_{{ obj.id }}.showModal()"><svg width="1rem" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13 15C13.4167 15 13.7708 14.8542 14.0625 14.5625C14.3542 14.2708 14.5 13.9167 14.5 13.5C14.5 13.0833 14.3542 12.7292 14.0625 12.4375C13.7708 12.1458 13.4167 12 13 12C12.5833 12 12.2292 12.1458 11.9375 12.4375C11.6458 12.7292 11.5 13.0833 11.5 13.5C11.5 13.9167 11.6458 14.2708 11.9375 14.5625C12.2292 14.8542 12.5833 15 13 15ZM13 18C13.5167 18 13.9917 17.8792 14.425 17.6375C14.8583 17.3958 15.2083 17.075 15.475 16.675C15.1083 16.4583 14.7167 16.2917 14.3 16.175C13.8833 16.0583 13.45 16 13 16C12.55 16 12.1167 16.0583 11.7 16.175C11.2833 16.2917 10.8917 16.4583 10.525 16.675C10.7917 17.075 11.1417 17.3958 11.575 17.6375C12.0083 17.8792 12.4833 18 13 18ZM8 20C5.68333 19.4167 3.77083 18.0875 2.2625 16.0125C0.754167 13.9375 0 11.6333 0 9.1V3L8 0L16 3V8.675C15.6833 8.54167 15.3583 8.42083 15.025 8.3125C14.6917 8.20417 14.35 8.125 14 8.075V4.4L8 2.15L2 4.4V9.1C2 9.88333 2.10417 10.6667 2.3125 11.45C2.52083 12.2333 2.8125 12.9792 3.1875 13.6875C3.5625 14.3958 4.01667 15.05 4.55 15.65C5.08333 16.25 5.675 16.75 6.325 17.15C6.50833 17.6833 6.75 18.1917 7.05 18.675C7.35 19.1583 7.69167 19.5917 8.075 19.975C8.05833 19.975 8.04583 19.9792 8.0375 19.9875C8.02917 19.9958 8.01667 20 8 20ZM13 20C11.6167 20 10.4375 19.5125 9.4625 18.5375C8.4875 17.5625 8 16.3833 8 15C8 13.6167 8.4875 12.4375 9.4625 11.4625C10.4375 10.4875 11.6167 10 13 10C14.3833 10 15.5625 10.4875 16.5375 11.4625C17.5125 12.4375 18 13.6167 18 15C18 16.3833 17.5125 17.5625 16.5375 18.5375C15.5625 19.5125 14.3833 20 13 20Z" fill="currentColor"/>
-                            </svg>
-                                MANAGE PERMISSIONS</button></td>
-                            <th><a onclick="delete_modal_{{ obj.id }}.showModal()"><div class="tooltip tooltip-left" data-tip="Remove user from your company"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 21C6.45 21 5.97917 20.8042 5.5875 20.4125C5.19583 20.0208 5 19.55 5 19V6H4V4H9V3H15V4H20V6H19V19C19 19.55 18.8042 20.0208 18.4125 20.4125C18.0208 20.8042 17.55 21 17 21H7ZM17 6H7V19H17V6ZM9 17H11V8H9V17ZM13 17H15V8H13V17Z" fill="currentColor"/></svg></div></a>
-                            </th>
+                                    <form method="dialog" class="modal-backdrop">
+                                        <button>close</button>
+                                    </form>
+                                </dialog><button class="btn" onclick="show_perm_user_{{ obj.id }}.showModal()"><svg width="1rem" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 15C13.4167 15 13.7708 14.8542 14.0625 14.5625C14.3542 14.2708 14.5 13.9167 14.5 13.5C14.5 13.0833 14.3542 12.7292 14.0625 12.4375C13.7708 12.1458 13.4167 12 13 12C12.5833 12 12.2292 12.1458 11.9375 12.4375C11.6458 12.7292 11.5 13.0833 11.5 13.5C11.5 13.9167 11.6458 14.2708 11.9375 14.5625C12.2292 14.8542 12.5833 15 13 15ZM13 18C13.5167 18 13.9917 17.8792 14.425 17.6375C14.8583 17.3958 15.2083 17.075 15.475 16.675C15.1083 16.4583 14.7167 16.2917 14.3 16.175C13.8833 16.0583 13.45 16 13 16C12.55 16 12.1167 16.0583 11.7 16.175C11.2833 16.2917 10.8917 16.4583 10.525 16.675C10.7917 17.075 11.1417 17.3958 11.575 17.6375C12.0083 17.8792 12.4833 18 13 18ZM8 20C5.68333 19.4167 3.77083 18.0875 2.2625 16.0125C0.754167 13.9375 0 11.6333 0 9.1V3L8 0L16 3V8.675C15.6833 8.54167 15.3583 8.42083 15.025 8.3125C14.6917 8.20417 14.35 8.125 14 8.075V4.4L8 2.15L2 4.4V9.1C2 9.88333 2.10417 10.6667 2.3125 11.45C2.52083 12.2333 2.8125 12.9792 3.1875 13.6875C3.5625 14.3958 4.01667 15.05 4.55 15.65C5.08333 16.25 5.675 16.75 6.325 17.15C6.50833 17.6833 6.75 18.1917 7.05 18.675C7.35 19.1583 7.69167 19.5917 8.075 19.975C8.05833 19.975 8.04583 19.9792 8.0375 19.9875C8.02917 19.9958 8.01667 20 8 20ZM13 20C11.6167 20 10.4375 19.5125 9.4625 18.5375C8.4875 17.5625 8 16.3833 8 15C8 13.6167 8.4875 12.4375 9.4625 11.4625C10.4375 10.4875 11.6167 10 13 10C14.3833 10 15.5625 10.4875 16.5375 11.4625C17.5125 12.4375 18 13.6167 18 15C18 16.3833 17.5125 17.5625 16.5375 18.5375C15.5625 19.5125 14.3833 20 13 20Z" fill="currentColor"/>
+                                </svg>
+                                    MANAGE PERMISSIONS</button></td>
+                                <th>
+                                    <a class="mr-2" onclick="delete_modal_{{ obj.id }}.showModal()"><div class="tooltip tooltip-left" data-tip="Remove user from your company."><svg class="fill-error" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 21C6.45 21 5.97917 20.8042 5.5875 20.4125C5.19583 20.0208 5 19.55 5 19V6H4V4H9V3H15V4H20V6H19V19C19 19.55 18.8042 20.0208 18.4125 20.4125C18.0208 20.8042 17.55 21 17 21H7ZM17 6H7V19H17V6ZM9 17H11V8H9V17ZM13 17H15V8H13V17Z"/></svg></div></a>
+                                    <a onclick="reset_pwd_modal_{{ obj.id }}.showModal()"><div class="tooltip tooltip-left" data-tip="Generate a password reset link for this user."><svg class="fill-primary" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 18C5.33333 18 3.91667 17.4167 2.75 16.25C1.58333 15.0833 1 13.6667 1 12C1 10.3333 1.58333 8.91667 2.75 7.75C3.91667 6.58333 5.33333 6 7 6C8.1 6 9.10833 6.275 10.025 6.825C10.9417 7.375 11.6667 8.1 12.2 9H23V15H21V18H15V15H12.2C11.6667 15.9 10.9417 16.625 10.025 17.175C9.10833 17.725 8.1 18 7 18ZM7 16C8.1 16 8.98333 15.6625 9.65 14.9875C10.3167 14.3125 10.7167 13.65 10.85 13H17V16H19V13H21V11H10.85C10.7167 10.35 10.3167 9.6875 9.65 9.0125C8.98333 8.3375 8.1 8 7 8C5.9 8 4.95833 8.39167 4.175 9.175C3.39167 9.95833 3 10.9 3 12C3 13.1 3.39167 14.0417 4.175 14.825C4.95833 15.6083 5.9 16 7 16ZM7 14C7.55 14 8.02083 13.8042 8.4125 13.4125C8.80417 13.0208 9 12.55 9 12C9 11.45 8.80417 10.9792 8.4125 10.5875C8.02083 10.1958 7.55 10 7 10C6.45 10 5.97917 10.1958 5.5875 10.5875C5.19583 10.9792 5 11.45 5 12C5 12.55 5.19583 13.0208 5.5875 13.4125C5.97917 13.8042 6.45 14 7 14Z"/></svg></div></a>
+                                </th>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <script>
+        function copyToClipboardAdd() {
+            const fullHostName = window.location.origin;
+            navigator.clipboard.writeText(fullHostName + "{{ invited_user_reset_token }}");
+            document.getElementById("link-success-add").classList.remove("hidden");
+        }
+    </script>
 {% endblock %}

@@ -1,7 +1,10 @@
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, Permission, PermissionsMixin
 from django.core.cache import cache
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -68,12 +71,21 @@ class Account(AbstractBaseUser, PermissionsMixin):
         perms = []
         for group in group_perms:
             perms.append(Permission.objects.get(codename=f"{group}_full_access"))
-        self.user_permissions.set([
-            *perms,
-            Permission.objects.get(codename="extra_can_export"),
-            Permission.objects.get(codename="extra_company_admin")
-        ])
+        self.user_permissions.set(
+            [
+                *perms,
+                Permission.objects.get(codename="extra_can_export"),
+                Permission.objects.get(codename="extra_company_admin"),
+            ]
+        )
         self.save()
+
+    @property
+    def get_reset_password_link(self) -> str:
+        """Returns a token used to reset the user's password (only valid for 24h)."""
+        token = uuid.uuid4()
+        cache.set(f"reset_password_{self.id}", token, 60 * 60 * 24)
+        return reverse("users:reset_password", kwargs={"user_id": self.id, "token": token})
 
 
 class Company(models.Model):
@@ -103,8 +115,10 @@ class Company(models.Model):
 
     def set_basic_custom_fields(self) -> None:
         """Set the basic `AllowedFields` for this Company."""
-        AllowedField.objects.bulk_create([
-            AllowedField(name="first_name", type="str", belongs_to=self),
-            AllowedField(name="last_name", type="str", belongs_to=self),
-            AllowedField(name="age", type="number", belongs_to=self)
-        ])
+        AllowedField.objects.bulk_create(
+            [
+                AllowedField(name="first_name", type="str", belongs_to=self),
+                AllowedField(name="last_name", type="str", belongs_to=self),
+                AllowedField(name="age", type="number", belongs_to=self),
+            ]
+        )
