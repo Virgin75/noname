@@ -61,4 +61,5 @@ class CompanyForm(forms.ModelForm):
             self.request.user.company = company
             self.request.user.save()
             self.request.user.set_admin_permissions()
+            company.set_basic_custom_fields()
         return company

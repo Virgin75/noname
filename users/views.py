@@ -92,7 +92,6 @@ class CreateCompanyView(SuccessMessageMixin, CreateView, LoginRequiredMixin):
         return kwargs
 
 
-
 class UpdateCompanyView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
     """View used to update the user's Company details."""
 

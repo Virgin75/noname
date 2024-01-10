@@ -13,9 +13,9 @@
             <a href="?{% param_replace page=page_obj.previous_page_number %}" class="join-item btn bg-base-100">{{ page_obj.previous_page_number }}</a>
         {% endif %}
         {% if page_obj.paginator.num_pages == 1 %}
-            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-secondary rounded-2xl">{{ page_obj.number }}</a>
+            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-primary-content rounded-2xl">{{ page_obj.number }}</a>
         {% else %}
-            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-secondary">{{ page_obj.number }}</a>
+            <a href="?{% param_replace page=page_obj.number %}" class="join-item btn bg-primary-content">{{ page_obj.number }}</a>
         {% endif %}
         {% if page_obj.has_next %}
             <a href="?{% param_replace page=page_obj.next_page_number %}" class="join-item btn bg-base-100">{{ page_obj.next_page_number }}</a>

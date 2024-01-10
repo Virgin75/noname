@@ -13,7 +13,7 @@ class Contact(HistoryMixin):
     A Contact is a person that opted-in to receive emails from a Company.
     """
 
-    email = models.EmailField()
+    email = models.EmailField(db_index=True)
     belongs_to = models.ForeignKey("users.Company", on_delete=models.CASCADE, null=True, blank=True)
     fields = models.JSONField(default=dict)
     is_unsubscribed = models.BooleanField(default=False, db_index=True)
@@ -21,14 +21,17 @@ class Contact(HistoryMixin):
 
     objects = ContactExportManager()
 
-    def __str__(self):
-        return self.email
+    class Meta:
+        unique_together = ("email", "belongs_to")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         """Override save to set unsubscribed_date when is_unsubscribed is set to True."""
         if self.is_unsubscribed and self.unsubscribed_date is None:
             self.unsubscribed_date = timezone.now()
         super().save(force_insert, force_update, using, update_fields)
+
+
+
 
 
 class AllowedField(models.Model):

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from contacts.models import AllowedField
 from users.managers import CustomUserManager
 
 
@@ -99,3 +100,11 @@ class Company(models.Model):
     def slug_name(self) -> str:
         """Returns the slugified name of the company (only characters that are accepted in URL or file names)."""
         return slugify(self.name)
+
+    def set_basic_custom_fields(self) -> None:
+        """Set the basic `AllowedFields` for this Company."""
+        AllowedField.objects.bulk_create([
+            AllowedField(name="first_name", type="str", belongs_to=self),
+            AllowedField(name="last_name", type="str", belongs_to=self),
+            AllowedField(name="age", type="number", belongs_to=self)
+        ])

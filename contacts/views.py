@@ -118,8 +118,8 @@ class ListContact(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView
             context["filter"].qs.filter(created_at__range=(today_min, today_max)).values("id").count()
         )
         context["stats_contacts_status"] = context["filter"].qs.aggregate(
-            count_unsub=Count("id", filter=Q(is_unsubscribed=None) | Q(is_unsubscribed=False)),
-            count_sub=Count("is_unsubscribed", filter=Q(is_unsubscribed=True)),
+            count_sub=Count("id", filter=Q(is_unsubscribed=None) | Q(is_unsubscribed=False)),
+            count_unsub=Count("is_unsubscribed", filter=Q(is_unsubscribed=True)),
         )
         return context
 
