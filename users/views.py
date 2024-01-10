@@ -1,8 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.cache import cache
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -150,7 +152,23 @@ class AddUserPermissionView(UpdateView, LoginRequiredMixin):
     """View used to add a permission to a user (HTMX)."""
 
     def post(self, request, *args, **kwargs):
-        """Add the permission to the user and return the updated user's permissions."""
-        user = Account.objects.get(id=kwargs.get("user_id"))
-        print(request.POST)
-        return HttpResponse("hello there")
+        """Add the permission to the user."""
+        try:
+            user = Account.objects.get(id=kwargs.get("user_id"), company=request.user.company)
+            perm_group = list(request.POST.keys())[0]
+            chosen_perm = list(request.POST.values())[0]
+            print(chosen_perm)
+            user_perms = user.user_permissions.filter(codename__startswith=perm_group)
+            print(user_perms)
+            for perm in user_perms:
+                user.user_permissions.remove(perm)
+            if chosen_perm != "null":
+                user.user_permissions.add(Permission.objects.get(codename=chosen_perm))
+            print(user.user_permissions.all())
+            cache.delete(f"perms_{user.id}")
+        except Account.DoesNotExist:
+            return HttpResponse(status=404)
+        import time
+        time.sleep(2)
+
+        return HttpResponse(status=200)
