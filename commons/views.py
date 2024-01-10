@@ -4,12 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.list import BaseListView
 
 from commons.filters import ExportFilter
 from commons.models import ExportLog
 
 
-class HomeView(TemplateView, LoginRequiredMixin):
+class HomeView(LoginRequiredMixin, TemplateView):
     template_name = "commons/home.html"
 
 

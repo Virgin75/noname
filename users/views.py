@@ -12,7 +12,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import BaseUpdateView, CreateView, FormView, UpdateView
 
-from users.forms import AuthForm, CompanyForm, UserRegisterForm
+from users.forms import AuthForm, CompanyForm, UserRegisterForm, UserUpdateForm
 from users.models import Account
 
 
@@ -136,7 +136,7 @@ class UpdateAccountView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
     template_name = "users/update_account.html"
     success_message = "Your profile was updated successfully."
     success_url = reverse_lazy("users:update_account")
-    form_class = UserRegisterForm
+    form_class = UserUpdateForm
 
     def get_object(self, **kwargs):
         """Only allow the user to update his own Account."""

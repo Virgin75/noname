@@ -210,3 +210,5 @@ CACHES = {
         "LOCATION": f"redis://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}",
     }
 }
+
+LOGIN_URL = "/login"

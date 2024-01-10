@@ -30,6 +30,18 @@ class UserRegisterForm(UserCreationForm):
         return user
 
 
+class UserUpdateForm(forms.ModelForm):
+    """Form used to update an existing User instance."""
+
+    class Meta:
+        model = Account
+        fields = ["email", "first_name", "last_name"]
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+
 class CompanyForm(forms.ModelForm):
     """Form used on Company creation page (just after 1st login), also used to edit a Company details."""
 
