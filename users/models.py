@@ -61,6 +61,19 @@ class Account(AbstractBaseUser, PermissionsMixin):
             cache.set(f"perms_{self.id}", perms_choices, 60 * 60)
             return perms_choices
 
+    def set_admin_permissions(self) -> None:
+        """Set all Admin permissions to the user."""
+        group_perms = ["contacts", "pages", "products", "emails"] + settings.PLUGIN_APPS
+        perms = []
+        for group in group_perms:
+            perms.append(Permission.objects.get(codename=f"{group}_full_access"))
+        self.user_permissions.set([
+            *perms,
+            Permission.objects.get(codename="extra_can_export"),
+            Permission.objects.get(codename="extra_company_admin")
+        ])
+        self.save()
+
 
 class Company(models.Model):
     """A Company is an entity gathering users together.

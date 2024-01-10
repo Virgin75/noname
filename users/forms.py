@@ -43,7 +43,10 @@ class CompanyForm(forms.ModelForm):
 
     def save(self, commit=True):
         """When the Company is created, set the user's company to this one. Then save the user."""
+        is_first_creation = not self.instance.pk
         company = super().save(commit=True)
-        self.request.user.company = company
-        self.request.user.save()
+        if is_first_creation:
+            self.request.user.company = company
+            self.request.user.save()
+            self.request.user.set_admin_permissions()
         return company

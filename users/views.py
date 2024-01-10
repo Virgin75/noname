@@ -92,6 +92,7 @@ class CreateCompanyView(SuccessMessageMixin, CreateView, LoginRequiredMixin):
         return kwargs
 
 
+
 class UpdateCompanyView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
     """View used to update the user's Company details."""
 
@@ -152,23 +153,26 @@ class AddUserPermissionView(UpdateView, LoginRequiredMixin):
     """View used to add a permission to a user (HTMX)."""
 
     def post(self, request, *args, **kwargs):
-        """Add the permission to the user."""
+        """Add the chosen permission to the User instance."""
         try:
             user = Account.objects.get(id=kwargs.get("user_id"), company=request.user.company)
             perm_group = list(request.POST.keys())[0]
             chosen_perm = list(request.POST.values())[0]
-            print(chosen_perm)
             user_perms = user.user_permissions.filter(codename__startswith=perm_group)
-            print(user_perms)
-            for perm in user_perms:
-                user.user_permissions.remove(perm)
-            if chosen_perm != "null":
-                user.user_permissions.add(Permission.objects.get(codename=chosen_perm))
-            print(user.user_permissions.all())
+            if perm_group not in ("extra_can_export", "extra_company_admin"):
+                # Uniselect
+                for perm in user_perms:
+                    user.user_permissions.remove(perm)
+                if chosen_perm != "null":
+                    user.user_permissions.add(Permission.objects.get(codename=chosen_perm))
+            else:
+                # Multiselect
+                if chosen_perm == "yes":
+                    user.user_permissions.add(Permission.objects.get(codename=perm_group))
+                else:
+                    user.user_permissions.remove(Permission.objects.get(codename=perm_group))
+
             cache.delete(f"perms_{user.id}")
         except Account.DoesNotExist:
             return HttpResponse(status=404)
-        import time
-        time.sleep(2)
-
         return HttpResponse(status=200)

@@ -74,7 +74,7 @@
                                                                     {% if group == "extra" %}
                                                                         <select hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" hx-swap="none" name="{{ key }}">
                                                                           <option value="yes" {% if value %}selected{% endif %}>Yes</option>
-                                                                          <option value="no" {% if value %}selected{% endif %}>No</option>
+                                                                          <option value="no" {% if not value %}selected{% endif %}>No</option>
                                                                         </select>
                                                                     {% else %}
                                                                         <input hx-post="{% url "users:add_user_permission" obj.id %}" hx-trigger="change" hx-indicator="#spinner" type="radio" id="{{ key }}" name="{{ group }}" value="{{ key }}" {% if value %}checked{% endif %}/>
