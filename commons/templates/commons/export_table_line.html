@@ -1,8 +1,8 @@
 <tr>
-    <th>{{ obj.id }}</th>
-    <th style="min-width: 230px;">{% include "commons/display_as_date.html" with value=obj.created_at|default:""%}</th>
+    <td>{{ obj.id }}</td>
+    <td style="min-width: 230px;">{% include "commons/display_as_date.html" with value=obj.created_at|default:""%}</td>
     <th>{{ obj.type|capfirst }}</th>
-    <th>{{ obj.file_name }}</th>
+    <td>{{ obj.file_name }}</td>
     <td>{% include "commons/display_as_colored_badge.html" with value=obj.status %}</td>
     <td>{{ obj.final_size }}</td>
     <td>{{ obj.user_id|default:"" }}</td>

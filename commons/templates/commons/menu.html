@@ -49,6 +49,7 @@
     </a>
   </li>
 
+  {% if perms.users.contacts_full_access or perms.users.contacts_read_only_access %}
   <li>
     <details {% if request.path == list_custom_fields_url  or request.path == list_segments_url or request.path == list_contacts_url or update_contact_url in request.path %}open{% else %}{% endif %}>
       <summary>
@@ -64,7 +65,9 @@
       </ul>
     </details>
   </li>
+  {% endif %}
 
+  {% if perms.users.pages_full_access or perms.users.pages_read_only_access %}
   <li>
     <details>
       <summary>
@@ -80,7 +83,9 @@
       </ul>
     </details>
   </li>
+  {% endif %}
 
+  {% if perms.users.products_full_access or perms.users.products_read_only_access %}
   <li>
     <details>
       <summary>
@@ -95,7 +100,9 @@
       </ul>
     </details>
   </li>
+  {% endif %}
 
+  {% if perms.users.emails_full_access or perms.users.emails_read_only_access %}
   <li>
     <details>
       <summary>
@@ -110,6 +117,8 @@
       </ul>
     </details>
   </li>
+  {% endif %}
+
 </ul>
 <ul class="menu mt-auto">
   <li>

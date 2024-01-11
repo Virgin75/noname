@@ -4659,6 +4659,10 @@ details.collapse summary::-webkit-details-marker {
   width: 100%;
 }
 
+.w-10\/12 {
+  width: 83.333333%;
+}
+
 .max-w-3xl {
   max-width: 48rem;
 }
@@ -4926,6 +4930,10 @@ details.collapse summary::-webkit-details-marker {
 
 .fill-secondary {
   fill: var(--fallback-s,oklch(var(--s)/1));
+}
+
+.fill-base-300 {
+  fill: var(--fallback-b3,oklch(var(--b3)/1));
 }
 
 .stroke-current {

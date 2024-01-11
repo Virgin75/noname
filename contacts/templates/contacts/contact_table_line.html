@@ -1,6 +1,6 @@
 {% include "contacts/delete_contact.html" %}
 <tr>
-    <th>{{ contact.id }}</th>
+    <td>{{ contact.id }}</td>
     <th><a href="{% url "contacts:update_contact" contact.id %}">{{ contact.email }}</a></th>
     {% for key, custom_field_value in contact.items %}
         {% if key != "id" and key != "email" and key != "created_at" and key != "updated_at" and key != "updated_by" %}

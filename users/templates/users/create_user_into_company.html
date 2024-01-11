@@ -1,6 +1,6 @@
 <dialog id="create_modal" class="modal">
   <div class="modal-box">
-    <h3 class="font-bold text-lg">Create a new User to add into your company</h3>
+    <h3 class="font-bold text-lg">Create a new User to add them into your company</h3>
     <form method="POST" action="{% url "users:add_company_member" %}">
       {% csrf_token %}
       {{ create_form.as_div }}

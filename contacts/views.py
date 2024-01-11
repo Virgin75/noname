@@ -2,7 +2,7 @@ import datetime
 import pickle
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
@@ -22,7 +22,7 @@ from django.views.generic.edit import (
 )
 from django.views.generic.list import ListView
 
-from commons.views import FilterMixin
+from commons.views import FilterMixin, OrPermissionsMixin
 from contacts.filters import (
     ContactFilter,
     CustomFieldFilter,
@@ -187,10 +187,11 @@ class ExportContacts(SuccessMessageMixin, LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
 
-class ListCustomField(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView):
+class ListCustomField(OrPermissionsMixin, SuccessMessageMixin, FilterMixin, LoginRequiredMixin, ListView):
     template_name = "contacts/list_custom_fields.html"
     filterset_class = CustomFieldFilter
     paginate_by = 10
+    permission_required = ("users.contacts_full_access", "users.contacts_read_only_access")
 
     def get_queryset(self):
         """Filter Custom fields with the user's Company."""
@@ -205,11 +206,12 @@ class ListCustomField(SuccessMessageMixin, FilterMixin, LoginRequiredMixin, List
         return context
 
 
-class CreateCustomField(LoginRequiredMixin, FormView, SuccessMessageMixin):
+class CreateCustomField(PermissionRequiredMixin, LoginRequiredMixin, FormView, SuccessMessageMixin):
     """View used to create a new custom field."""
 
     form_class = CustomFieldForm
     success_message = "Field created successfully."
+    permission_required = "users.contacts_full_access"
 
     def form_valid(self, form) -> HttpResponse:
         """Override 'form_valid()' to update 'belongs_to' field and return a single line to add to table."""
@@ -225,12 +227,13 @@ class CreateCustomField(LoginRequiredMixin, FormView, SuccessMessageMixin):
         return HttpResponseRedirect(reverse_lazy("contacts:list_custom_fields"))
 
 
-class DeleteCustomField(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
+class DeleteCustomField(PermissionRequiredMixin, SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     """View used to delete a custom field."""
 
     model = AllowedField
     success_url = reverse_lazy("contacts:list_custom_fields")
     success_message = "Field deleted successfully."
+    permission_required = "users.contacts_full_access"
 
 
 class ListSegment(SuccessMessageMixin, LoginRequiredMixin, FilterMixin, ListView):

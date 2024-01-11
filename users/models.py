@@ -79,6 +79,19 @@ class Account(AbstractBaseUser, PermissionsMixin):
             ]
         )
         self.save()
+        cache.delete(f"perms_{self.id}")
+        self.get_app_permissions()
+
+    def set_basic_permissions(self) -> None:
+        """Set all 'read_only' permissions to the user."""
+        group_perms = ["contacts", "pages", "products", "emails"] + settings.PLUGIN_APPS
+        perms = []
+        for group in group_perms:
+            perms.append(Permission.objects.get(codename=f"{group}_read_only_access"))
+        self.user_permissions.set(perms)
+        self.save()
+        cache.delete(f"perms_{self.id}")
+        self.get_app_permissions()
 
     @property
     def get_reset_password_link(self) -> str:

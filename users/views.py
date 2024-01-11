@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
@@ -134,13 +134,19 @@ class CreateCompanyView(SuccessMessageMixin, CreateView, LoginRequiredMixin):
         return kwargs
 
 
-class UpdateCompanyView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
+class UpdateCompanyView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView, LoginRequiredMixin):
     """View used to update the user's Company details."""
 
     template_name = "users/company_details.html"
     success_message = "Company updated successfully."
     success_url = reverse_lazy("users:update_company")
     form_class = CompanyForm
+
+    def get_permission_required(self):
+        """Dynamically set permissions depending on HTTP method."""
+        if self.request.method in ("POST", "PUT", "PATCH"):
+            return ["users.extra_company_admin"]
+        return []
 
     def get_object(self, **kwargs):
         """Only return the current user's Company."""
@@ -173,12 +179,13 @@ class ListCompanyMembersView(ListView, LoginRequiredMixin):
         return context
 
 
-class DeleteCompanyMemberView(SuccessMessageMixin, DeleteView, LoginRequiredMixin):
+class DeleteCompanyMemberView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView, LoginRequiredMixin):
     """View used to delete a Company member."""
 
     model = Account
     success_message = "Member removed from company successfully."
     success_url = reverse_lazy("users:company_members")
+    permission_required = "users.extra_company_admin"
 
     def post(self, request, *args, **kwargs):
         """Remove the user from the company and display a success message."""
@@ -192,13 +199,14 @@ class DeleteCompanyMemberView(SuccessMessageMixin, DeleteView, LoginRequiredMixi
         return HttpResponseRedirect(self.success_url)
 
 
-class AddCompanyMemberView(SuccessMessageMixin, CreateView, LoginRequiredMixin):
+class AddCompanyMemberView(PermissionRequiredMixin, SuccessMessageMixin, CreateView, LoginRequiredMixin):
     """View used to create a new user (Account) and add him into the current Company."""
 
     model = Account
     form_class = UserUpdateForm
     success_message = "User successfully created and added to the Company."
     success_url = reverse_lazy("users:company_members")
+    permission_required = "users.extra_company_admin"
 
     def form_valid(self, form):
         """If the form is valid, add the user to the current Company and display a success message."""
@@ -206,6 +214,7 @@ class AddCompanyMemberView(SuccessMessageMixin, CreateView, LoginRequiredMixin):
         user.company = self.request.user.company
         user.set_unusable_password()
         user.save()
+        user.set_basic_permissions()
         messages.success(self.request, self.success_message)
         return HttpResponseRedirect(self.success_url + f"?invited_user_reset_token={user.get_reset_password_link}")
 
@@ -223,14 +232,15 @@ class UpdateAccountView(SuccessMessageMixin, UpdateView, LoginRequiredMixin):
         return self.request.user
 
 
-class AddUserPermissionView(UpdateView, LoginRequiredMixin):
+class AddUserPermissionView(PermissionRequiredMixin, UpdateView, LoginRequiredMixin):
     """View used to add a permission to a user (HTMX)."""
+    permission_required = "users.extra_company_admin"
 
     def post(self, request, *args, **kwargs):
         """Add the chosen permission to the User instance."""
         try:
             user = Account.objects.get(id=kwargs.get("user_id"), company=request.user.company)
-            perm_group = list(request.POST.keys())[0]
+            perm_group = list(request.POST.keys())[0].split("-")[0]
             chosen_perm = list(request.POST.values())[0]
             user_perms = user.user_permissions.filter(codename__startswith=perm_group)
             if perm_group not in ("extra_can_export", "extra_company_admin"):
@@ -252,10 +262,12 @@ class AddUserPermissionView(UpdateView, LoginRequiredMixin):
         return HttpResponse(status=200)
 
 
-class RetrieveResetTokenView(DetailView, LoginRequiredMixin):
+class RetrieveResetTokenView(PermissionRequiredMixin, DetailView, LoginRequiredMixin):
     """View used to retrieve the password reset token for a specific user (HTMX)."""
+    permission_required = "users.extra_company_admin"
+
     def get(self, request, *args, **kwargs):
-        """Return the reset password link for given user."""
+        """Return the reset password link for given user (in their clipboard)."""
         user = Account.objects.get(id=kwargs.get("user_id"), company=request.user.company)
         reset_password_url = f"{request.scheme}://{request.get_host()}{user.get_reset_password_link}"
         html = (

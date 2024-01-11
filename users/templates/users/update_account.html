@@ -9,7 +9,7 @@
             <h1 class="heading-1">{{ object.first_name|capfirst }} {{ object.last_name|capfirst }}</h1>
         </div>
     </div>
-    <p class="mb-10">Edit your profile information and confirm with your password before clicking on "Update".</p>
+    <p class="mb-10">Edit your profile information on this page.</p>
     <div class="flex gap-3 items-center mb-8 flex-wrap">
         {% include "commons/display_as_colored_badge.html" with value=object.company.name|default:""%}
         <p class="px-2">|</p>
