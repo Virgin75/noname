@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import (
     BaseUpdateView,
     CreateView,
@@ -250,3 +250,18 @@ class AddUserPermissionView(UpdateView, LoginRequiredMixin):
         except Account.DoesNotExist:
             return HttpResponse(status=404)
         return HttpResponse(status=200)
+
+
+class RetrieveResetTokenView(DetailView, LoginRequiredMixin):
+    """View used to retrieve the password reset token for a specific user (HTMX)."""
+    def get(self, request, *args, **kwargs):
+        """Return the reset password link for given user."""
+        user = Account.objects.get(id=kwargs.get("user_id"), company=request.user.company)
+        reset_password_url = f"{request.scheme}://{request.get_host()}{user.get_reset_password_link}"
+        html = (
+            '<p class="text-green-600 text-right">Link copied to clipboard.</p>'
+            '<script>'
+            f'    navigator.clipboard.writeText("{reset_password_url}");'
+            '</script>'
+        )
+        return HttpResponse(status=200, content=html)

@@ -12,12 +12,14 @@ from users.views import (
     SignUpView,
     UpdateAccountView,
     UpdateCompanyView,
+    RetrieveResetTokenView,
 )
 
 urlpatterns = [
     path("signup/", SignUpView.as_view(), name="signup"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("retrieve-reset-token/<int:user_id>", RetrieveResetTokenView.as_view(), name="retrieve_reset_token"),
     path("create-company/", CreateCompanyView.as_view(), name="create_company"),
     path("update-company/", UpdateCompanyView.as_view(), name="update_company"),
     path("company-members/", ListCompanyMembersView.as_view(), name="company_members"),
