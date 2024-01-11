@@ -13,7 +13,7 @@
       <form method="post" class="flex gap-4 flex-wrap items-end">
         {% csrf_token %}
         {{ form.as_div }}
-        <button class="btn btn-primary" type="submit">Update</button>
+        <button class="btn btn-primary" type="submit">UPDATE</button>
       </form>
       <a class="btn mt-6" href="{% url "contacts:list_custom_fields" %}">Create new fields</a>
     </div>

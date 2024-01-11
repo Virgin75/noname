@@ -5,9 +5,9 @@
     <form method="post" class="flex flex-col mobile:w-full desktop:w-1/3">
       {% csrf_token %}
       {{ form.as_div }}
-      <button type="submit" class="btn btn-primary">Sign up</button>
+      <button type="submit" class="btn btn-primary">SIGN UP</button>
       <div class="divider">OR</div>
-      <a class="btn btn-secondary" href="{% url 'users:login' %}">Login</a>
+      <a class="btn btn-secondary" href="{% url 'users:login' %}">LOGIN</a>
     </form>
   </div>
 {% endblock %}

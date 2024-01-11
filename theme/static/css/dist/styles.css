@@ -2183,6 +2183,14 @@ input.tab:checked + .tab-content,
   color: var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)));
 }
 
+.badge-info {
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-in,oklch(var(--in)/var(--tw-bg-opacity)));
+  --tw-text-opacity: 1;
+  color: var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)));
+}
+
 .badge-success {
   border-color: transparent;
   --tw-bg-opacity: 1;
@@ -2738,19 +2746,6 @@ details.collapse summary::-webkit-details-marker {
 
 .join-item:focus {
   isolation: isolate;
-}
-
-@supports (color:color-mix(in oklab,black,black)) {
-  @media (hover:hover) {
-    .link-success:hover {
-      color: color-mix(in oklab,var(--fallback-su,oklch(var(--su)/1)) 80%,black);
-    }
-  }
-}
-
-.link-success {
-  --tw-text-opacity: 1;
-  color: var(--fallback-su,oklch(var(--su)/var(--tw-text-opacity)));
 }
 
 .link:focus {
@@ -4395,16 +4390,16 @@ details.collapse summary::-webkit-details-marker {
   left: 2.5rem;
 }
 
+.right-2 {
+  right: 0.5rem;
+}
+
 .start-1 {
   inset-inline-start: 0.25rem;
 }
 
 .top-10 {
   top: 2.5rem;
-}
-
-.right-2 {
-  right: 0.5rem;
 }
 
 .top-2 {
@@ -4456,6 +4451,10 @@ details.collapse summary::-webkit-details-marker {
   margin-right: 0.25rem;
 }
 
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 .mr-auto {
   margin-right: auto;
 }
@@ -4468,6 +4467,10 @@ details.collapse summary::-webkit-details-marker {
   margin-top: 5rem;
 }
 
+.mt-4 {
+  margin-top: 1rem;
+}
+
 .mt-5 {
   margin-top: 1.25rem;
 }
@@ -4478,14 +4481,6 @@ details.collapse summary::-webkit-details-marker {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.mr-2 {
-  margin-right: 0.5rem;
 }
 
 .block {
@@ -4897,24 +4892,6 @@ details.collapse summary::-webkit-details-marker {
   background-color: var(--fallback-pc,oklch(var(--pc)/var(--tw-bg-opacity)));
 }
 
-.bg-success {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-su,oklch(var(--su)/var(--tw-bg-opacity)));
-}
-
-.bg-success-content {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-suc,oklch(var(--suc)/var(--tw-bg-opacity)));
-}
-
-.bg-success\/50 {
-  background-color: var(--fallback-su,oklch(var(--su)/0.5));
-}
-
-.bg-success\/80 {
-  background-color: var(--fallback-su,oklch(var(--su)/0.8));
-}
-
 .bg-success\/20 {
   background-color: var(--fallback-su,oklch(var(--su)/0.2));
 }
@@ -4925,6 +4902,10 @@ details.collapse summary::-webkit-details-marker {
 
 .fill-current {
   fill: currentColor;
+}
+
+.fill-error {
+  fill: var(--fallback-er,oklch(var(--er)/1));
 }
 
 .fill-green-600 {
@@ -4945,10 +4926,6 @@ details.collapse summary::-webkit-details-marker {
 
 .fill-secondary {
   fill: var(--fallback-s,oklch(var(--s)/1));
-}
-
-.fill-error {
-  fill: var(--fallback-er,oklch(var(--er)/1));
 }
 
 .stroke-current {
@@ -5130,11 +5107,6 @@ details.collapse summary::-webkit-details-marker {
   color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity));
-}
-
 .underline {
   text-decoration-line: underline;
 }
@@ -5168,12 +5140,6 @@ details.collapse summary::-webkit-details-marker {
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.shadow-xl {
-  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 

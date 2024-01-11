@@ -16,9 +16,9 @@
         <form method="post" class="flex flex-col mobile:w-full desktop:w-1/3">
             {% csrf_token %}
             {{ form.as_div }}
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary">LOGIN</button>
             <div class="divider">OR</div>
-            <a class="btn btn-secondary" href="{% url 'users:signup' %}">Sign up</a>
+            <a class="btn btn-secondary" href="{% url 'users:signup' %}">SIGN UP</a>
         </form>
     </div>
 
