@@ -38,6 +38,12 @@ def param_replace(context, **kwargs):
     return d.urlencode()
 
 
+@register.simple_tag(takes_context=True)
+def has_perm(context, name=None):
+    user = context["request"].user
+    return user.has_permission(name)
+
+
 @register.simple_tag
 def get_app_version() -> str:
     return settings.APP_VERSION or "err"

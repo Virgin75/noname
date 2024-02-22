@@ -93,6 +93,14 @@ class Account(AbstractBaseUser, PermissionsMixin):
         cache.delete(f"perms_{self.id}")
         self.get_app_permissions()
 
+    def has_permission(self, perm: str) -> bool:
+        """Check if the user has the permission `perm`."""
+        perms = list(p for p in self.get_app_permissions().values())
+        for p in sum(perms, []):
+            if perm in p.keys() and p[perm]:
+                return True
+        return False
+
     @property
     def get_reset_password_link(self) -> str:
         """Returns a token used to reset the user's password (only valid for 24h)."""
