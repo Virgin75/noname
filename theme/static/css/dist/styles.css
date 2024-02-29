@@ -5850,6 +5850,34 @@ details.collapse summary::-webkit-details-marker {
   value: "third";
 }
 
+.\[chunk_start\:pos\] {
+  chunk_start: pos;
+}
+
+.\[last\:m\.start\(0\)\] {
+  last: m.start(0);
+}
+
+.\[i\:i\+6\] {
+  i: i+6;
+}
+
+.\[i\:i\+self\.max_outbound_frame_size\] {
+  i: i+self.max outbound frame size;
+}
+
+.\[padding_data_length\:len\(data\)-self\.pad_length\] {
+  padding_data_length: len(data)-self.pad length;
+}
+
+.\[priority_data_length\:len\(data\)-self\.pad_length\] {
+  priority_data_length: len(data)-self.pad length;
+}
+
+.\[current_position\:start_position\] {
+  current_position: start position;
+}
+
 html {
   font-size: max(12px, 0.85vw);
   font-family: "Poppins", sans-serif;
