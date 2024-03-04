@@ -1,6 +1,8 @@
 import asyncio
+import logging
 from asyncio import Future
 from datetime import datetime
+from typing import Generator
 
 import httpx
 from django.utils import timezone
@@ -10,6 +12,9 @@ from bs4 import BeautifulSoup
 
 from django.core.validators import URLValidator
 from urllib.parse import urlparse
+
+
+logger = logging.getLogger(__name__)
 
 
 class Page:
@@ -61,40 +66,67 @@ class Crawler:
         self.exclude_url_params = exclude_url_params
         self.timeout = timeout
         self.max_concurrent_requests = max_concurrent_requests
+        self.domain = ""
         # Crawl stats
         self.current_depth = 0
         self.start_crawl_time = None
         self.end_crawl_time = None
-        self.pages = set()
+        self.visited_url = set()
 
-    def _crawl_at_current_depth(self):
-        pass
+    @staticmethod
+    def _remove_trailing_slash(url: str) -> str:
+        """Remove trailing slash from URL (if any)."""
+        if url.endswith('/'):
+            return url[:-1]
+        return url
 
-    def _get_internal_links(self, page_content: str) -> list[str]:
+    def _crawl_at_current_depth(self, pages: set[str]):
+        """Crawl all the pages at the current depth."""
+        pages_content = self._get_pages_content(list(pages), asyncio.get_event_loop())
+        internal_urls = []
+        for content in pages_content:
+            internal_urls.extend(self._get_internal_links(content))
+        internal_urls = set(internal_urls)
+        new_internal_urls = internal_urls - self.visited_url
+        self.visited_url |= internal_urls
+        if new_internal_urls:
+            self.current_depth += 1
+            self._crawl_at_current_depth(new_internal_urls)
+        return
+
+    def _get_internal_links(self, page_content: str) -> Generator:
         """Return all internal links found in a page."""
-        pages = set()
         bs = BeautifulSoup(page_content, 'html.parser')
         links = bs.findAll('a')
         for link in links:
+            if not link.get('href'):
+                continue
             href = link.get('href')
+            if (
+                href.startswith("#") or href.startswith("mailto") or href.startswith("tel")
+                or href.startswith("/#")
+            ):
+                continue
             if not href.startswith('http'):
-                href = self.website + href
-            if href.startswith(self.website) and not href.endswith('.pdf'):
-                pages.add(href)
-        self.pages |= pages
-        return list(pages)
+                leading_slash = '' if href.startswith('/') else '/'
+                href = self.website + leading_slash + href
+            if href.startswith(self.website + '#'):
+                continue
+            if href.startswith('http://' + self.domain) or href.startswith('https://' + self.domain) and not href.endswith('.pdf'):
+                yield self._remove_trailing_slash(href)
 
-    async def _get_page_content(self, page: str):
+    async def _get_page_content(self, page: str) -> str:
         """Return the content of a page."""
         response = await asyncio.to_thread(
             requests.get,
             page,
             headers={"User-Agent": self.user_agent},
-            timeout=self.timeout
+            timeout=self.timeout,
+            verify=False
         )
         return response.text
 
-    def _get_pages_content(self, pages: list[str], loop: asyncio.AbstractEventLoop = None):
+    def _get_pages_content(self, pages: list[str], loop: asyncio.AbstractEventLoop = None) -> list[str]:
         """Return the content of a list of pages by batch of 'max_concurrent_requests'."""
         contents = []
         for i in range(0, len(pages), self.max_concurrent_requests):
@@ -107,10 +139,9 @@ class Crawler:
         """Start crawling all the pages of the website."""
         self.validate_website()
         self.start_crawl_time = timezone.now()
-        homepage = requests.get(self.website, headers={"User-Agent": self.user_agent}, timeout=self.timeout)
-        internal_links = self._get_internal_links(homepage.text)
-        pages_content = self._get_pages_content(internal_links, asyncio.get_event_loop())
+        self._crawl_at_current_depth({self.website})
         self.end_crawl_time = timezone.now()
+        print(f"Crawling '{self.website}' ({len(self.visited_url)} pages) done in {self.end_crawl_time - self.start_crawl_time}.")
 
     def validate_website(self) -> None:
         """Make sure 'self.website' is a valid URL and is the root page of website."""
@@ -120,5 +151,5 @@ class Crawler:
         parsed_url = urlparse(self.website)
         # Keep only scheme and hostname (root)
         self.website = f"{parsed_url.scheme}://{parsed_url.hostname}"
-        self.pages.add(self.website)
-
+        self.domain = parsed_url.hostname
+        self.visited_url.add(self.website)
