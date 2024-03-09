@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Generator
 
 import httpx
+from aioretry.retry import MaxRetriesException
 from django.utils import timezone
 import requests
 from functools import cache
@@ -13,8 +14,53 @@ from bs4 import BeautifulSoup
 from django.core.validators import URLValidator
 from urllib.parse import urlparse
 
-
+import urllib3
+urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
+
+from typing import (
+  Tuple
+)
+
+from aioretry import (
+    retry,
+    # Tuple[bool, Union[int, float]]
+    RetryPolicyStrategy,
+    RetryInfo
+)
+
+# This example shows the usage with python typings
+def retry_policy(info: RetryInfo) -> RetryPolicyStrategy:
+    """
+    - It will always retry until succeeded
+    - If fails for the first time, it will retry immediately,
+    - If it fails again,
+      aioretry will perform a 100ms delay before the second retry,
+      200ms delay before the 3rd retry,
+      the 4th retry immediately,
+      100ms delay before the 5th retry,
+      etc...
+    """
+    print(info.fails)
+    if info.fails >= 1:
+        return True, 0
+    return False, (info.fails - 1) % 3 * 0.1
+
+
+class InternalLink:
+    """
+    Represents an internal link found in a webpage.
+
+    Kwargs for initialization:
+    -------------------------
+      from_page (str): The URL of the page where the link was found.
+      to_page (str): The URL of the page the link points to.
+      anchor_text (str): The anchor text of the link.
+    """
+    def __init__(self, from_page: str, to_page: str, anchor_text: str = ""):
+        self.from_page = from_page
+        self.to_page = to_page
+        self.anchor_text = anchor_text
 
 
 class Page:
@@ -72,6 +118,7 @@ class Crawler:
         self.start_crawl_time = None
         self.end_crawl_time = None
         self.visited_url = set()
+        self.internal_links = []
 
     @staticmethod
     def _remove_trailing_slash(url: str) -> str:
@@ -84,18 +131,19 @@ class Crawler:
         """Crawl all the pages at the current depth."""
         pages_content = self._get_pages_content(list(pages), asyncio.get_event_loop())
         internal_urls = []
-        for content in pages_content:
-            internal_urls.extend(self._get_internal_links(content))
+        for url, html in pages_content:
+            internal_urls.extend(self._get_internal_links(html, url))
         internal_urls = set(internal_urls)
         new_internal_urls = internal_urls - self.visited_url
         self.visited_url |= internal_urls
+        print(f"Depth {self.current_depth} over: {len(new_internal_urls)} new internal links found.")
         if new_internal_urls:
             self.current_depth += 1
             self._crawl_at_current_depth(new_internal_urls)
         return
 
-    def _get_internal_links(self, page_content: str) -> Generator:
-        """Return all internal links found in a page."""
+    def _get_internal_links(self, page_content: str, url: str) -> Generator:
+        """Return all internal links found from a page HTML content."""
         bs = BeautifulSoup(page_content, 'html.parser')
         links = bs.findAll('a')
         for link in links:
@@ -103,33 +151,45 @@ class Crawler:
                 continue
             href = link.get('href')
             if (
-                href.startswith("#") or href.startswith("mailto") or href.startswith("tel")
-                or href.startswith("/#")
+                href.startswith("mailto") or href.startswith("tel")
             ):
                 continue
             if not href.startswith('http'):
                 leading_slash = '' if href.startswith('/') else '/'
                 href = self.website + leading_slash + href
-            if href.startswith(self.website + '#'):
-                continue
+            if '#' in href:
+                href = href.split('#')[0]
             if href.startswith('http://' + self.domain) or href.startswith('https://' + self.domain) and not href.endswith('.pdf'):
-                yield self._remove_trailing_slash(href)
+                internal_link = self._remove_trailing_slash(href)
+                self.internal_links.append(
+                    InternalLink(from_page=url, to_page=internal_link, anchor_text=link.text)
+                )
+                yield internal_link
 
-    async def _get_page_content(self, page: str) -> str:
-        """Return the content of a page."""
+    def _before_retry(self, info: RetryInfo):
+        """Log the retry."""
+        print("retrying..." + str(info.fails) + " " + str(info.exception) + " " + str(info.since))
+
+    @retry(retry_policy, before_retry="_before_retry")
+    async def _get_page_content(self, page: str) -> tuple[str, str]:
+        """Return a tuple containing: (URL of the page, its HTML content)."""
         response = await asyncio.to_thread(
-            requests.get,
-            page,
-            headers={"User-Agent": self.user_agent},
-            timeout=self.timeout,
-            verify=False
+                    requests.get,
+                    page,
+                    headers={"User-Agent": self.user_agent},
+                    timeout=self.timeout,
+                    verify=False
         )
-        return response.text
+        return page, response.text
+
+
+
 
     def _get_pages_content(self, pages: list[str], loop: asyncio.AbstractEventLoop = None) -> list[str]:
         """Return the content of a list of pages by batch of 'max_concurrent_requests'."""
         contents = []
         for i in range(0, len(pages), self.max_concurrent_requests):
+            print(f"Getting content of pages {i} to {i + self.max_concurrent_requests}.")
             coroutines = [self._get_page_content(page) for page in pages[i:i + self.max_concurrent_requests]]
             res = loop.run_until_complete(asyncio.gather(*coroutines))
             contents.extend(res)
