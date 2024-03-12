@@ -1,14 +1,11 @@
 import asyncio
+from dataclasses import dataclass
 import logging
-from asyncio import Future
 from datetime import datetime
 from typing import Generator
 
-import httpx
-from aioretry.retry import MaxRetriesException
 from django.utils import timezone
 import requests
-from functools import cache
 from bs4 import BeautifulSoup
 
 from django.core.validators import URLValidator
@@ -18,13 +15,9 @@ import urllib3
 urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
-from typing import (
-  Tuple
-)
 
-from aioretry import (
+from commons.async_retry import (
     retry,
-    # Tuple[bool, Union[int, float]]
     RetryPolicyStrategy,
     RetryInfo
 )
@@ -41,12 +34,12 @@ def retry_policy(info: RetryInfo) -> RetryPolicyStrategy:
       100ms delay before the 5th retry,
       etc...
     """
-    print(info.fails)
-    if info.fails >= 1:
+    if info.fails >= 3:
         return True, 0
     return False, (info.fails - 1) % 3 * 0.1
 
 
+@dataclass
 class InternalLink:
     """
     Represents an internal link found in a webpage.
@@ -57,20 +50,21 @@ class InternalLink:
       to_page (str): The URL of the page the link points to.
       anchor_text (str): The anchor text of the link.
     """
-    def __init__(self, from_page: str, to_page: str, anchor_text: str = ""):
-        self.from_page = from_page
-        self.to_page = to_page
-        self.anchor_text = anchor_text
+    from_page: str
+    to_page: str
+    anchor_text: str = ""
 
 
+@dataclass
 class Page:
     """
     Represents a webpage discovered by a Crawler.
     """
-    def __init__(self, url: str = None, html: str = None, crawled_at: datetime = timezone.now()):
-        self.url = url
-        self.html = html
-        self.crawled_at = crawled_at
+
+    url: str
+    page_depth: int
+    meta_title: str
+    meta_description: str
 
     def __eq__(self, other):
         """Consider two Pages are equal if their URLs are equal."""
@@ -119,6 +113,11 @@ class Crawler:
         self.end_crawl_time = None
         self.visited_url = set()
         self.internal_links = []
+        self.pages = set()
+
+    @staticmethod
+    def _extract_values_from_page(html: str) -> Page:
+        pass
 
     @staticmethod
     def _remove_trailing_slash(url: str) -> str:
@@ -132,6 +131,8 @@ class Crawler:
         pages_content = self._get_pages_content(list(pages), asyncio.get_event_loop())
         internal_urls = []
         for url, html in pages_content:
+            page = self._extract_values_from_page(html)
+            self.pages.add(page)
             internal_urls.extend(self._get_internal_links(html, url))
         internal_urls = set(internal_urls)
         new_internal_urls = internal_urls - self.visited_url
@@ -173,16 +174,16 @@ class Crawler:
     @retry(retry_policy, before_retry="_before_retry")
     async def _get_page_content(self, page: str) -> tuple[str, str]:
         """Return a tuple containing: (URL of the page, its HTML content)."""
-        response = await asyncio.to_thread(
-                    requests.get,
-                    page,
-                    headers={"User-Agent": self.user_agent},
-                    timeout=self.timeout,
-                    verify=False
+        response = await asyncio.wait_for(
+            asyncio.to_thread(
+                requests.get,
+                page,
+                headers={"User-Agent": self.user_agent},
+                verify=False
+            ),
+            timeout=self.timeout
         )
         return page, response.text
-
-
 
 
     def _get_pages_content(self, pages: list[str], loop: asyncio.AbstractEventLoop = None) -> list[str]:
