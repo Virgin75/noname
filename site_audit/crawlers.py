@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import dataclass
 import logging
 from datetime import datetime
+from playwright.async_api import async_playwright
 from typing import Generator
 
 from django.utils import timezone
@@ -115,9 +116,6 @@ class Crawler:
         self.internal_links = []
         self.pages = set()
 
-    @staticmethod
-    def _extract_values_from_page(html: str) -> Page:
-        pass
 
     @staticmethod
     def _remove_trailing_slash(url: str) -> str:
@@ -128,15 +126,20 @@ class Crawler:
 
     def _crawl_at_current_depth(self, pages: set[str]):
         """Crawl all the pages at the current depth."""
-        pages_content = self._get_pages_content(list(pages), asyncio.get_event_loop())
-        internal_urls = []
-        for url, html in pages_content:
-            page = self._extract_values_from_page(html)
-            self.pages.add(page)
-            internal_urls.extend(self._get_internal_links(html, url))
-        internal_urls = set(internal_urls)
-        new_internal_urls = internal_urls - self.visited_url
-        self.visited_url |= internal_urls
+        pages_at_current_depth = list(pages)
+        internal_urls_found = []
+        limit = self.max_concurrent_requests
+        while pages_at_current_depth:
+            print(f"Getting content of pages at depth {self.current_depth}...")
+            print(f"Pages left: {len(pages_at_current_depth)}")
+            current_batch_urls = pages_at_current_depth[:limit]
+            pages_content = asyncio.run(self._get_pages_content(current_batch_urls))
+            for url, html in pages_content:
+                internal_urls_found.extend(self._get_internal_links(html, url))
+            self.visited_url |= set(current_batch_urls)
+            del pages_at_current_depth[:limit]
+
+        new_internal_urls = set(internal_urls_found) - self.visited_url
         print(f"Depth {self.current_depth} over: {len(new_internal_urls)} new internal links found.")
         if new_internal_urls:
             self.current_depth += 1
@@ -172,27 +175,24 @@ class Crawler:
         print("retrying..." + str(info.fails) + " " + str(info.exception) + " " + str(info.since))
 
     @retry(retry_policy, before_retry="_before_retry")
-    async def _get_page_content(self, page: str) -> tuple[str, str]:
+    async def _get_page_content(self, url: str, async_p) -> tuple[str, str]:
         """Return a tuple containing: (URL of the page, its HTML content)."""
-        response = await asyncio.wait_for(
-            asyncio.to_thread(
-                requests.get,
-                page,
-                headers={"User-Agent": self.user_agent},
-                verify=False
-            ),
-            timeout=self.timeout
-        )
-        return page, response.text
+        browser = await async_p.chromium.launch()
+        page = await browser.new_page()
+        response = await page.goto(url)
+        content = await page.content()
+        # TODO: block image loading and js analytics tools
+        print(response.status)
+        await browser.close()
+        return url, content
 
 
-    def _get_pages_content(self, pages: list[str], loop: asyncio.AbstractEventLoop = None) -> list[str]:
+    async def _get_pages_content(self, pages: list[str]) -> list[str]:
         """Return the content of a list of pages by batch of 'max_concurrent_requests'."""
         contents = []
-        for i in range(0, len(pages), self.max_concurrent_requests):
-            print(f"Getting content of pages {i} to {i + self.max_concurrent_requests}.")
-            coroutines = [self._get_page_content(page) for page in pages[i:i + self.max_concurrent_requests]]
-            res = loop.run_until_complete(asyncio.gather(*coroutines))
+        async with async_playwright() as async_p:
+            coroutines = [self._get_page_content(page, async_p) for page in pages]
+            res = await asyncio.gather(*coroutines)
             contents.extend(res)
         return contents
 
