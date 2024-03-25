@@ -1,43 +1,18 @@
-import asyncio
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import logging
-from datetime import datetime
-from playwright.async_api import async_playwright
+from random import randint
+from time import sleep
+
+from playwright.sync_api import sync_playwright
 from typing import Generator
 
 from django.utils import timezone
-import requests
 from bs4 import BeautifulSoup
 
 from django.core.validators import URLValidator
 from urllib.parse import urlparse
-
-import urllib3
-urllib3.disable_warnings()
-logger = logging.getLogger(__name__)
-
-
-from commons.async_retry import (
-    retry,
-    RetryPolicyStrategy,
-    RetryInfo
-)
-
-# This example shows the usage with python typings
-def retry_policy(info: RetryInfo) -> RetryPolicyStrategy:
-    """
-    - It will always retry until succeeded
-    - If fails for the first time, it will retry immediately,
-    - If it fails again,
-      aioretry will perform a 100ms delay before the second retry,
-      200ms delay before the 3rd retry,
-      the 4th retry immediately,
-      100ms delay before the 5th retry,
-      etc...
-    """
-    if info.fails >= 3:
-        return True, 0
-    return False, (info.fails - 1) % 3 * 0.1
 
 
 @dataclass
@@ -108,6 +83,9 @@ class Crawler:
         self.timeout = timeout
         self.max_concurrent_requests = max_concurrent_requests
         self.domain = ""
+        # Thread pool settings
+        self.thread_pool = None
+        self.tls = None
         # Crawl stats
         self.current_depth = 0
         self.start_crawl_time = None
@@ -116,6 +94,9 @@ class Crawler:
         self.internal_links = []
         self.pages = set()
 
+    def _init_worker(self, tls):
+        """Initialize the Threads local storage with a Playwright instance."""
+        tls.playwright = sync_playwright().start()
 
     @staticmethod
     def _remove_trailing_slash(url: str) -> str:
@@ -129,11 +110,14 @@ class Crawler:
         pages_at_current_depth = list(pages)
         internal_urls_found = []
         limit = self.max_concurrent_requests
+        print(f"Getting content of pages at depth {self.current_depth}...")
+
         while pages_at_current_depth:
-            print(f"Getting content of pages at depth {self.current_depth}...")
             print(f"Pages left: {len(pages_at_current_depth)}")
             current_batch_urls = pages_at_current_depth[:limit]
-            pages_content = asyncio.run(self._get_pages_content(current_batch_urls))
+            pages_content = []
+            for res in self.thread_pool.map(self._get_page_content, current_batch_urls):
+                pages_content.append(res)
             for url, html in pages_content:
                 internal_urls_found.extend(self._get_internal_links(html, url))
             self.visited_url |= set(current_batch_urls)
@@ -155,7 +139,7 @@ class Crawler:
                 continue
             href = link.get('href')
             if (
-                href.startswith("mailto") or href.startswith("tel")
+                href.startswith("mailto") or href.startswith("tel") or href.startswith("javascript")
             ):
                 continue
             if not href.startswith('http'):
@@ -165,44 +149,49 @@ class Crawler:
                 href = href.split('#')[0]
             if href.startswith('http://' + self.domain) or href.startswith('https://' + self.domain) and not href.endswith('.pdf'):
                 internal_link = self._remove_trailing_slash(href)
-                self.internal_links.append(
-                    InternalLink(from_page=url, to_page=internal_link, anchor_text=link.text)
-                )
                 yield internal_link
 
-    def _before_retry(self, info: RetryInfo):
-        """Log the retry."""
-        print("retrying..." + str(info.fails) + " " + str(info.exception) + " " + str(info.since))
 
-    @retry(retry_policy, before_retry="_before_retry")
-    async def _get_page_content(self, url: str, async_p) -> tuple[str, str]:
+    def _get_page_content(self, url: str, max_retries: int = 3) -> tuple[str, str]:
         """Return a tuple containing: (URL of the page, its HTML content)."""
-        browser = await async_p.chromium.launch()
-        page = await browser.new_page()
-        response = await page.goto(url)
-        content = await page.content()
-        # TODO: block image loading and js analytics tools
-        print(response.status)
-        await browser.close()
-        return url, content
-
-
-    async def _get_pages_content(self, pages: list[str]) -> list[str]:
-        """Return the content of a list of pages by batch of 'max_concurrent_requests'."""
-        contents = []
-        async with async_playwright() as async_p:
-            coroutines = [self._get_page_content(page, async_p) for page in pages]
-            res = await asyncio.gather(*coroutines)
-            contents.extend(res)
-        return contents
+        try:
+            browser = self.tls.playwright.chromium.launch(headless=True)
+            context = browser.new_context()
+            page = context.new_page()
+            page.route("**/*.*", lambda r: r.abort() if r.request.resource_type == "image" else r.continue_())
+            sleep(randint(0, 6))
+            page.goto(url, timeout=self.timeout * 1000)
+            content = page.content()
+            print(f"done get page from thread: {threading.current_thread().name}")
+            page.close()
+            context.close()
+            browser.close()
+            return url, content
+        except Exception as e:
+            print(f"Error: {e}")
+            if max_retries > 0:
+                print("Waiting 2 seconds before retrying...")
+                sleep(1)
+                print(f"Retrying: {url} >> {max_retries} more time(s)...")
+                return self._get_page_content(url, max_retries - 1)
+            return url, ""
 
     def crawl(self):
         """Start crawling all the pages of the website."""
-        self.validate_website()
-        self.start_crawl_time = timezone.now()
-        self._crawl_at_current_depth({self.website})
-        self.end_crawl_time = timezone.now()
-        print(f"Crawling '{self.website}' ({len(self.visited_url)} pages) done in {self.end_crawl_time - self.start_crawl_time}.")
+        try:
+            self.validate_website()
+            self.tls = threading.local()
+            self.thread_pool = ThreadPoolExecutor(
+                max_workers=self.max_concurrent_requests, initializer=self._init_worker, initargs=(self.tls,)
+            )
+            self.start_crawl_time = timezone.now()
+            self._crawl_at_current_depth({self.website})
+            self.end_crawl_time = timezone.now()
+            print(f"Crawling '{self.website}' ({len(self.visited_url)} pages) done in {self.end_crawl_time - self.start_crawl_time}.")
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            self.thread_pool.shutdown(wait=False)
 
     def validate_website(self) -> None:
         """Make sure 'self.website' is a valid URL and is the root page of website."""
