@@ -1,3 +1,4 @@
+import hashlib
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -5,7 +6,7 @@ import logging
 from random import randint
 from time import sleep
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Request, Route
 from typing import Generator
 
 from django.utils import timezone
@@ -72,7 +73,7 @@ class Crawler:
             exclude_patterns: list[str] = None,
             exclude_pages: list[str] = None,
             exclude_url_params: bool = True,
-            timeout: int = 8,
+            timeout: int = 15,
             max_concurrent_requests: int = 5
     ):
         self.website = website
@@ -83,6 +84,8 @@ class Crawler:
         self.timeout = timeout
         self.max_concurrent_requests = max_concurrent_requests
         self.domain = ""
+        # Temporary storage for JS content
+        self.pages_js = {}
         # Thread pool settings
         self.thread_pool = None
         self.tls = None
@@ -97,6 +100,7 @@ class Crawler:
     def _init_worker(self, tls):
         """Initialize the Threads local storage with a Playwright instance."""
         tls.playwright = sync_playwright().start()
+        tls.current_page = {}
 
     @staticmethod
     def _remove_trailing_slash(url: str) -> str:
@@ -151,30 +155,53 @@ class Crawler:
                 internal_link = self._remove_trailing_slash(href)
                 yield internal_link
 
+    def _check_resource(self, route: Route) -> None:
+        """Abort requests for non-HTML/JS resources. We don't want to download them."""
+        if route.request.resource_type in ["image", "media", "font", "stylesheet"]:
+            route.abort()
+        elif route.request.resource_type == "script":
+            exclude_list = ["analytics.js", "gtm.js", "matomo.js"]
+            if any(script for script in exclude_list if script in route.request.url):
+                route.abort()
+            else:
+                res = route.fetch()
+                self.tls.current_page[threading.current_thread().name]["js"] += res.text()
+                route.continue_()
+        else:
+            route.continue_()
 
     def _get_page_content(self, url: str, max_retries: int = 3) -> tuple[str, str]:
         """Return a tuple containing: (URL of the page, its HTML content)."""
-        try:
+        if max_retries > 0:
             browser = self.tls.playwright.chromium.launch(headless=True)
-            context = browser.new_context()
+            context = browser.new_context(accept_downloads=False, user_agent=self.user_agent)
             page = context.new_page()
-            page.route("**/*.*", lambda r: r.abort() if r.request.resource_type == "image" else r.continue_())
-            sleep(randint(0, 6))
-            page.goto(url, timeout=self.timeout * 1000)
-            content = page.content()
-            print(f"done get page from thread: {threading.current_thread().name}")
-            page.close()
-            context.close()
-            browser.close()
-            return url, content
-        except Exception as e:
-            print(f"Error: {e}")
-            if max_retries > 0:
-                print("Waiting 2 seconds before retrying...")
-                sleep(1)
-                print(f"Retrying: {url} >> {max_retries} more time(s)...")
-                return self._get_page_content(url, max_retries - 1)
-            return url, ""
+            self.tls.current_page[threading.current_thread().name] = {"url": url, "js": ""}
+            try:
+                page.route("**/*.*", self._check_resource)
+                sleep(randint(0, 6))
+                page.goto(url, timeout=self.timeout * 1000)
+                content = page.content()
+                js_sha = hashlib.sha256(self.tls.current_page[threading.current_thread().name]["js"].encode('utf-8')).hexdigest()
+                html_sha = hashlib.sha256(content.encode('utf-8')).hexdigest()
+                print(js_sha)
+                print(f"done get page from thread: {threading.current_thread().name}")
+                page.close()
+                context.close()
+                browser.close()
+                return url, content
+            except Exception as e:
+                print(f"Error: {e}")
+                page.close()
+                context.close()
+                browser.close()
+                if max_retries > 0:
+                    print("Waiting 1 second before retrying...")
+                    sleep(1)
+                    print(f"Retrying: {url} >> {max_retries} more time(s)...")
+                    return self._get_page_content(url, max_retries - 1)
+                return url, ""
+        return url, ""
 
     def crawl(self):
         """Start crawling all the pages of the website."""
