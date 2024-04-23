@@ -212,3 +212,5 @@ CACHES = {
 }
 
 LOGIN_URL = "/login"
+
+ASYNC_TASK = os.getenv("ASYNC_TASK", "django_rq")  # DJANGO_RQ or MODAL.COM
