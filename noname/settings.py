@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "contacts",
     "django.forms",
     "django_rq",
-    "noname.apps.MainAppConfig",
 ]
 PLUGIN_APPS = []
 if os.getenv("env") == "local":
@@ -82,25 +81,17 @@ AUTH_USER_MODEL = "users.Account"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES_POSTGRES_LOCAL = {
-    "ENGINE": "django.db.backends.postgresql",
-    "NAME": "default_database",
-    "USER": "username",
-    "PASSWORD": "password",
-    "HOST": "localhost",
-    "PORT": 5432,
+DATABASES = {
+    "default": {
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.environ.get('DB_NAME', 'default_database'),
+        'USER': os.environ.get('DB_USER', 'username'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+    }
 }
-
-DATABASES = {}
 ENV = os.environ.get("env")
-match ENV:
-    case "local":
-        DATABASES["default"] = DATABASES_POSTGRES_LOCAL
-    case "test":
-        pass
-    case "prod":
-        pass
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -214,3 +205,6 @@ CACHES = {
 LOGIN_URL = "/login"
 
 ASYNC_TASK = os.getenv("ASYNC_TASK", "django_rq")  # DJANGO_RQ or MODAL.COM
+MODAL_TOKEN_ID = os.getenv("MODAL_TOKEN_ID", None)
+MODAL_TOKEN_SECRET = os.getenv("MODAL_TOKEN_SECRET", None)
+# Modal deploy command : modal deploy __init__.py --env dev
