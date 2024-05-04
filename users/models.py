@@ -120,9 +120,7 @@ class Company(models.Model):
     """
 
     name = models.CharField(max_length=80, unique=True)
-    address = models.CharField(max_length=80, null=True, blank=True)
-    city = models.CharField(max_length=50, null=True, blank=True)
-    country = models.CharField(max_length=50, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 

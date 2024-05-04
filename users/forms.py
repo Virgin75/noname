@@ -70,7 +70,7 @@ class CompanyForm(forms.ModelForm):
 
     class Meta:
         model = Company
-        fields = ["name", "address", "city", "country"]
+        fields = ["name", "website"]
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
