@@ -20,6 +20,7 @@ django_app_image = (
     .pip_install_from_requirements("requirements.txt")
     .workdir("/app")
     .env({"DJANGO_SETTINGS_MODULE": "noname.settings"})
+    .run_commands("playwright install", "playwright install-deps")
     .copy_local_dir("bin", "/app/bin")
     .copy_local_dir("commons", "/app/commons")
     .copy_local_dir("contacts", "/app/contacts")
@@ -28,11 +29,6 @@ django_app_image = (
     .copy_local_dir("noname", "/app/noname")
     .copy_local_dir("site_audit", "/app/site_audit")
     .copy_local_file("manage.py", "/app/manage.py")
-)
-playwright_image = (
-    Image.debian_slim(python_version="3.11")
-    .pip_install("playwright==1.42.0", "Django==4.2.0", "beautifulsoup4==4.12.3")
-    .run_commands("playwright install", "playwright install-deps")
 )
 
 
@@ -53,6 +49,7 @@ class Crawler:
     def __init__(
             self,
             website: str = None,
+            company = None,
             user_agent: str = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
             exclude_patterns: list[str] = None,
             exclude_pages: list[str] = None,
@@ -61,6 +58,7 @@ class Crawler:
             max_concurrent_requests: int = 5
     ):
         self.website = website
+        self.company = company
         self.user_agent = user_agent
         self.exclude_patterns = exclude_patterns or []
         self.exclude_pages = exclude_pages or []
@@ -156,6 +154,8 @@ class Crawler:
 
     def _get_page_content(self, url: str, max_retries: int = 3) -> tuple[str, str]:
         """Return a tuple containing: (URL of the page, its HTML content)."""
+        from site_audit.models import Page
+
         if max_retries > 0:
             browser = self.tls.playwright.chromium.launch(headless=True)
             context = browser.new_context(accept_downloads=False, user_agent=self.user_agent)
@@ -166,13 +166,12 @@ class Crawler:
                 sleep(randint(0, 6))
                 page.goto(url, timeout=self.timeout * 1000)
                 content = page.content()
-                js_sha = hashlib.sha256(self.tls.current_page[threading.current_thread().name]["js"].encode('utf-8')).hexdigest()
-                html_sha = hashlib.sha256(content.encode('utf-8')).hexdigest()
-                print(js_sha)
+                sha = hashlib.sha256(self.tls.current_page[threading.current_thread().name]["js"].encode('utf-8') + content.encode('utf-8')).hexdigest()
                 print(f"done get page from thread: {threading.current_thread().name}")
                 page.close()
                 context.close()
                 browser.close()
+                self.pages.add(Page(url=url, content_sha256=sha, last_crawl_at=datetime.now(), company=self.company))
                 return url, content
             except Exception as e:
                 print(f"Error: {e}")
@@ -199,8 +198,6 @@ class Crawler:
             self._crawl_at_current_depth({self.website})
             self.end_crawl_time = datetime.now()
             print(f"Crawling '{self.website}' ({len(self.visited_url)} pages) done in {self.end_crawl_time - self.start_crawl_time}.")
-        except Exception as e:
-            print(f"Error: {e}")
         finally:
             self.thread_pool.shutdown(wait=False)
 
@@ -219,10 +216,51 @@ class Crawler:
         self.visited_url.add(self.website)
 
 
-@site_audit.function(image=playwright_image, timeout=3600*3)
-def crawl_website(website: str):
-    crawler = Crawler(website=website)
-    crawler.crawl()
+@site_audit.function(image=django_app_image, timeout=3600*3, secrets=[modal.Secret.from_name("database")])
+def crawl_website(company_id: int = None, crawl_id: int = None):
+    """Start the crawl async task for a specific website."""
+    django.setup()
+    from commons.utils import OpenAndCloseDbConnection
+    from site_audit.enums import CrawlStatus
+    from site_audit.models import DailyCrawl, Page
+    from users.models import Company
+
+    try:
+        company = None
+        with OpenAndCloseDbConnection():
+            company = Company.objects.get(id=company_id)
+        crawler = Crawler(website=company.website, company=company)
+        crawler.crawl()
+        status = CrawlStatus.SUCCESS
+
+        # Retrieve pages with updated content since last crawl
+        updated_pages = []
+        new_pages = []
+        with OpenAndCloseDbConnection():
+            existing_pages = Page.objects.filter(company_id=company_id).only("content_sha256").in_bulk(field_name="url")
+            for page in crawler.pages:
+                if page.url in existing_pages and existing_pages[page.url].content_sha256 != page.content_sha256:
+                    updated_pages.append(page)
+                elif page.url not in existing_pages:
+                    new_pages.append(page)
+            # Create new pages in the database and update existing ones
+            Page.objects.bulk_create(
+                crawler.pages,
+                512,
+                update_conflicts=True,
+                update_fields=["last_crawl_at", "content_sha256"],
+                unique_fields=["company", "url"]
+            )
+            print(f"New pages: {len(new_pages)}")
+            print(f"Updated pages: {len(updated_pages)}")
+    except Exception as e:
+        status = CrawlStatus.FAILED
+    finally:
+        with OpenAndCloseDbConnection():
+            crawl_log = DailyCrawl.objects.get(id=crawl_id)
+            crawl_log.finished_at = datetime.now()
+            crawl_log.status = status
+            crawl_log.save()
 
 
 @site_audit.function(
@@ -235,7 +273,9 @@ def daily_crawl():
     django.setup()
     from commons.utils import OpenAndCloseDbConnection
     from users.models import Company
+    from site_audit.models import DailyCrawl
 
     with OpenAndCloseDbConnection():
-        for company in Company.objects.only("website"):
-            crawl_website.spawn(company.website)
+        for company in Company.objects.only("id", "website"):
+            crawl_log = DailyCrawl.objects.create(company=company)
+            crawl_website.spawn(company_id=company.id, crawl_id=crawl_log.id)

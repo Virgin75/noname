@@ -1,6 +1,14 @@
 from django.db import models
 
 
+class CrawlStatus(models.TextChoices):
+    """List of all possible crawl status."""
+    PENDING = "PENDING", "The crawl is pending."
+    RUNNING = "RUNNING", "The crawl is running."
+    SUCCESS = "SUCCESS", "The crawl has been successfully done."
+    FAILED = "FAILED", "The crawl failed."
+
+
 class AuditChoices(models.TextChoices):
     """List of all available audits ran daily on all pages of a website."""
     CRAWL_DEPTH = "CRAWL_DEPTH", "The current crawl depth of the page."

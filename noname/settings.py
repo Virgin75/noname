@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "contacts",
     "django.forms",
     "django_rq",
+    "site_audit",
 ]
 PLUGIN_APPS = []
 if os.getenv("env") == "local":
