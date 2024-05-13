@@ -20,7 +20,7 @@ django_app_image = (
     .pip_install_from_requirements("requirements.txt")
     .workdir("/app")
     .env({"DJANGO_SETTINGS_MODULE": "noname.settings"})
-    .run_commands("playwright install", "playwright install-deps")
+    .run_commands("playwright install", "playwright install-deps", "npm install -g lighthouse")
     .copy_local_dir("bin", "/app/bin")
     .copy_local_dir("commons", "/app/commons")
     .copy_local_dir("contacts", "/app/contacts")
@@ -78,6 +78,7 @@ class Crawler:
         self.visited_url = set()
         self.internal_links = []
         self.pages = set()
+        self_audits = []
 
     def _init_worker(self, tls):
         """Initialize the Threads local storage with a Playwright instance."""
@@ -171,7 +172,11 @@ class Crawler:
                 page.close()
                 context.close()
                 browser.close()
-                self.pages.add(Page(url=url, content_sha256=sha, last_crawl_at=datetime.now(), company=self.company))
+                self.pages.add(
+                    Page(
+                        url=url, content_sha256=sha, last_crawl_at=datetime.now(),
+                        company=self.company, meta_title=page.title()
+                ))
                 return url, content
             except Exception as e:
                 print(f"Error: {e}")
@@ -261,6 +266,16 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
             crawl_log.finished_at = datetime.now()
             crawl_log.status = status
             crawl_log.save()
+
+
+@site_audit.function(
+    image=django_app_image,
+    secrets=[modal.Secret.from_name("database")],
+    timeout=3600*3
+)
+def run_psi_audit(urls: list[str]):
+    """Run the Google Page Speed Insights audits via Lighthouse on a list of urls."""
+    django.setup()
 
 
 @site_audit.function(

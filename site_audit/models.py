@@ -1,6 +1,8 @@
 from datetime import timedelta
 
 from django.db import models
+from django.db.models import FloatField, F, Sum
+from django.utils.functional import cached_property
 
 from site_audit.enums import AuditChoices, CrawlStatus
 
@@ -33,6 +35,16 @@ class Page(models.Model):
             models.Index(fields=["company", "url"]),
         ]
 
+    @cached_property
+    def global_score(self) -> float:
+        """Return the global score of the page."""
+        return DailyPageAudit.objects.filter(page=self).aggregate(
+            w_avg=Sum(
+                (F('audit_score') * F('audit__global_weight')) / Sum('audit__global_weight'),
+                output_field=FloatField()
+            )
+        )
+
     def __str__(self):
         return self.url
 
@@ -45,17 +57,28 @@ class Page(models.Model):
         return hash(self.url)
 
 
-class DailyPageMetric(models.Model):
+class Audit(models.Model):
     """
-    Represents a daily metric for a webpage.
+    Represents a test executed on each webpage.
+    """
+    name = models.CharField(max_length=50, db_index=True, choices=AuditChoices.choices, blank=False, null=False)
+    category = models.CharField(max_length=50, db_index=True, blank=False, null=False)
+    description = models.TextField()
+    category_weight = models.FloatField(default=1.0)
+    global_weight = models.FloatField(default=1.0)
+
+
+class DailyPageAudit(models.Model):
+    """
+    Represents a daily audit value for a webpage.
 
     Everyday, the crawler gather a lot of different metrics on a page. This table is used to store these metrics.
+    The score is always a float from 0.00 to 1.00.
     """
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="metrics")
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="audits")
     company = models.ForeignKey("users.Company", on_delete=models.CASCADE)
-    metric_value = models.FloatField()
-    metric_name = models.CharField(max_length=50, db_index=True, choices=AuditChoices.choices, blank=False, null=False)
-    metric_date = models.DateField(auto_now_add=True, db_index=True)
+    audit_score = models.FloatField(null=True)
+    audit = models.ForeignKey(Audit, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("page", "metric_name", "metric_date")
@@ -66,14 +89,13 @@ class DailyPageMetric(models.Model):
 
 class DailySiteMetric(models.Model):
     """
-    Represents a daily metric record for the whole website.
+    Represents a daily metric record for the whole website (average).
 
     It represents an aggregation of all daily metrics of all the pages.
     """
     company = models.ForeignKey("users.Company", on_delete=models.CASCADE)
-    metric_value = models.FloatField()
-    metric_name = models.CharField(max_length=50, db_index=True)
-    metric_date = models.DateField(auto_now_add=True, db_index=True)
+    audit_avg_score = models.FloatField(null=True)
+    audit = models.ForeignKey(Audit, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("company", "metric_name", "metric_date")

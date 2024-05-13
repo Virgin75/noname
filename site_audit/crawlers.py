@@ -17,24 +17,3 @@ class InternalLink:
     anchor_text: str = ""
     from_page_anchor_text: int = 0
 
-
-@dataclass
-class Page:
-    """
-    Represents a webpage discovered by a Crawler.
-    """
-
-    url: str
-    page_depth: int
-    meta_title: str
-    meta_description: str
-
-    def __eq__(self, other):
-        """Consider two Pages are equal if their URLs are equal."""
-        return self.url == other.url
-
-    def __hash__(self):
-        """Return the hash of the URL."""
-        return hash(self.url)
-
-
