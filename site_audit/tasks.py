@@ -20,7 +20,8 @@ django_app_image = (
     .pip_install_from_requirements("requirements.txt")
     .workdir("/app")
     .env({"DJANGO_SETTINGS_MODULE": "noname.settings"})
-    .run_commands("playwright install", "playwright install-deps", "npm install -g lighthouse")
+    .apt_install("curl", "chromium")
+    .run_commands("curl -sL https://deb.nodesource.com/setup_20.x -o /tmp/nodesource_setup.sh", "bash /tmp/nodesource_setup.sh", "apt-get install nodejs -y", "playwright install", "playwright install-deps", "npm install -g lighthouse")
     .copy_local_dir("bin", "/app/bin")
     .copy_local_dir("commons", "/app/commons")
     .copy_local_dir("contacts", "/app/contacts")
@@ -221,6 +222,48 @@ class Crawler:
         self.visited_url.add(self.website)
 
 
+@site_audit.function(
+    image=django_app_image,
+    secrets=[modal.Secret.from_name("database")],
+    timeout=3600*3
+)
+def run_psi_audit(urls: list[str] = None):
+    """Run the Google Page Speed Insights audits via Lighthouse on a list of urls."""
+    django.setup()
+    import subprocess
+    import json
+    from commons.utils import get_nested_value
+    from site_audit.enums import AuditChoices
+    from site_audit.models import DailyPageAudit
+
+    for url in urls:
+        ps = subprocess.Popen([
+            "lighthouse", str(url), "--quiet", "--output=json", "--disable-full-page-screenshot", '--chrome-flags="--no-sandbox --headless"'
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        stdout, stderr = ps.communicate()
+        if stderr:
+            pass
+            return stderr
+
+        # Create a new 'DailyPageAudit' object
+        results = json.loads(stdout)
+        for audit in AuditChoices.get_psi_audits():
+            audit_result = get_nested_value(results, audit.psi_path)
+            audit_obj = DailyPageAudit(
+                audit_id=audit.value,
+                audit_score=audit_result,
+                page_id=url,
+                date=datetime.now().date(),
+                company="prout"
+            )
+
+        print(stdout)
+        print(stderr)
+        return stderr, stdout
+
+
+
 @site_audit.function(image=django_app_image, timeout=3600*3, secrets=[modal.Secret.from_name("database")])
 def crawl_website(company_id: int = None, crawl_id: int = None):
     """Start the crawl async task for a specific website."""
@@ -256,8 +299,7 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
                 update_fields=["last_crawl_at", "content_sha256"],
                 unique_fields=["company", "url"]
             )
-            print(f"New pages: {len(new_pages)}")
-            print(f"Updated pages: {len(updated_pages)}")
+            run_psi_audit.spawn(urls=updated_pages)
     except Exception as e:
         status = CrawlStatus.FAILED
     finally:
@@ -266,16 +308,6 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
             crawl_log.finished_at = datetime.now()
             crawl_log.status = status
             crawl_log.save()
-
-
-@site_audit.function(
-    image=django_app_image,
-    secrets=[modal.Secret.from_name("database")],
-    timeout=3600*3
-)
-def run_psi_audit(urls: list[str]):
-    """Run the Google Page Speed Insights audits via Lighthouse on a list of urls."""
-    django.setup()
 
 
 @site_audit.function(
