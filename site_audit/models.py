@@ -1,8 +1,10 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.db import models
+from django.db.models import Sum, F
 
 from site_audit.enums import AuditChoices, CrawlStatus
+from users.models import Company
 
 
 class DailyCrawl(models.Model):
@@ -76,6 +78,19 @@ class DailyPageAudit(models.Model):
         indexes = [
             models.Index(fields=["page", "company", "date", "audit", "audit_score"]),
         ]
+
+    @classmethod
+    def get_daily_category_avg(cls, for_company: Company = None, category: str = None):
+        """Get the current day score average for a given website (company), on a chosen audit category."""
+        if for_company is None:
+            raise ValueError("'for_company' kwargs is required.")
+
+        today = datetime.now().strftime("%m-%d-%Y")
+        return cls.objects.filter(
+            company=for_company, date=today, audit__category=category
+        ).aggregate(
+            avg=Sum(F('audit__category_weight') * F('audit_score')) / Sum('audit__category_weight')
+        )["avg"]
 
 
 class DailySiteMetric(models.Model):

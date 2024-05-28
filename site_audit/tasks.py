@@ -227,7 +227,7 @@ class Crawler:
     secrets=[modal.Secret.from_name("database")],
     timeout=3600*3
 )
-def run_psi_audit(urls: list[str] = None):
+def run_psi_audit(urls: list[str] = None, company_id: int = None):
     """Run the Google Page Speed Insights audits via Lighthouse on a list of urls."""
     django.setup()
     import subprocess
@@ -236,32 +236,34 @@ def run_psi_audit(urls: list[str] = None):
     from site_audit.enums import AuditChoices
     from site_audit.models import DailyPageAudit
 
+    audits = []
     for url in urls:
         ps = subprocess.Popen([
-            "lighthouse", str(url), "--quiet", "--output=json", "--disable-full-page-screenshot", '--chrome-flags="--no-sandbox --headless"'
+            "lighthouse",
+            str(url),
+            "--quiet",
+            "--output=json",
+            "--disable-full-page-screenshot",
+            '--chrome-flags="--no-sandbox --headless"'
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         stdout, stderr = ps.communicate()
-        if stderr:
-            pass
-            return stderr
+        print(stderr)
 
         # Create a new 'DailyPageAudit' object
         results = json.loads(stdout)
         for audit in AuditChoices.get_psi_audits():
             audit_result = get_nested_value(results, audit.psi_path)
-            audit_obj = DailyPageAudit(
-                audit_id=audit.value,
-                audit_score=audit_result,
-                page_id=url,
-                date=datetime.now().date(),
-                company="prout"
+            audits.append(
+                DailyPageAudit(
+                    audit_id=audit.value,
+                    audit_score=audit_result,
+                    page_id=url,
+                    date=datetime.now().date(),
+                    company_id=company_id
+                )
             )
-
-        print(stdout)
-        print(stderr)
-        return stderr, stdout
-
+    DailyPageAudit.objects.bulk_create(audits, 1024)
 
 
 @site_audit.function(image=django_app_image, timeout=3600*3, secrets=[modal.Secret.from_name("database")])
@@ -291,6 +293,7 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
                     updated_pages.append(page)
                 elif page.url not in existing_pages:
                     new_pages.append(page)
+
             # Create new pages in the database and update existing ones
             Page.objects.bulk_create(
                 crawler.pages,
@@ -299,7 +302,7 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
                 update_fields=["last_crawl_at", "content_sha256"],
                 unique_fields=["company", "url"]
             )
-            run_psi_audit.spawn(urls=updated_pages)
+            run_psi_audit.spawn(urls=updated_pages, company_id=company_id)
     except Exception as e:
         status = CrawlStatus.FAILED
     finally:
