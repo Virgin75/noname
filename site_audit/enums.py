@@ -16,8 +16,8 @@ class AuditChoices(models.TextChoices):
     Each value is a tuple meaning :
         1. The name of the audit.
         2. The category of the audit.
-        3. The weight of the audit in the overall score.
-        4. The weight of the audit in the category score.
+        3. The weight of the audit in the category score.
+        4. The weight of the audit in the overall score.
         5. The path to get the value from the Google Page Speed Insights audit (in json).
         6. A description of the audit.
     """
@@ -180,13 +180,13 @@ class AuditChoices(models.TextChoices):
     PSI_VALID_SOURCE_MAPS = ("PSI_VALID-SOURCE-MAPS", "seo", 0, 1, "audits.valid-source-maps.score", "Source maps translate minified code to the original source code. This helps developers debug in production. In addition, Lighthouse is able to provide further insights. Consider deploying source maps to take advantage of these benefits. [Learn more about source maps](https://developer.chrome.com/docs/devtools/javascript/source-maps/).", "VALID_SOURCE_MAPS")
     PSI_INSPECTOR_ISSUES = ("PSI_INSPECTOR-ISSUES", "seo", 1, 1, "audits.inspector-issues.score", "Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns. Open up the Issues panel in Chrome DevTools for more details on each issue.", "INSPECTOR_ISSUES")
 
-    def __new__(cls, value, category, global_weight, category_weight, psi_path, description):
+    def __new__(cls, value, category, category_weight, global_weight, psi_path, description):
         """Add the path in dict to get the value (from psi insights audit)."""
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj.category = category
-        obj.global_weight = global_weight
         obj.category_weight = category_weight
+        obj.global_weight = global_weight
         obj.psi_path = psi_path
         obj.description = description
         return obj

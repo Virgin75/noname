@@ -81,7 +81,7 @@ class DailyPageAudit(models.Model):
 
     @classmethod
     def get_daily_category_avg(cls, for_company: Company = None, category: str = None):
-        """Get the current day score average for a given website (company), on a chosen audit category."""
+        """Get the current daily score average for a given website (company), on a chosen audit category."""
         if for_company is None:
             raise ValueError("'for_company' kwargs is required.")
 

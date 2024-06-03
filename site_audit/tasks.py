@@ -248,21 +248,22 @@ def run_psi_audit(urls: list[str] = None, company_id: int = None):
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         stdout, stderr = ps.communicate()
-        print(stderr)
-
-        # Create a new 'DailyPageAudit' object
-        results = json.loads(stdout)
-        for audit in AuditChoices.get_psi_audits():
-            audit_result = get_nested_value(results, audit.psi_path)
-            audits.append(
-                DailyPageAudit(
-                    audit_id=audit.value,
-                    audit_score=audit_result,
-                    page_id=url,
-                    date=datetime.now().date(),
-                    company_id=company_id
+        if stderr:
+            print(stderr)
+        else:
+            # Create new 'DailyPageAudit' objects
+            results = json.loads(stdout)
+            for audit in AuditChoices.get_psi_audits():
+                audit_result = get_nested_value(results, audit.psi_path)
+                audits.append(
+                    DailyPageAudit(
+                        audit_id=audit.value,
+                        audit_score=audit_result,
+                        page_id=url,
+                        date=datetime.now().date(),
+                        company_id=company_id
+                    )
                 )
-            )
     DailyPageAudit.objects.bulk_create(audits, 1024)
 
 

@@ -24,6 +24,7 @@ services:
 
   postgres_test:
     image: postgres
+    container_name: postgres_test
     restart: always
     ports:
       - "5432:5432"

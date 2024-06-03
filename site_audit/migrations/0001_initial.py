@@ -15,7 +15,8 @@ def create_audit_entries(apps, schema_editor):
         )
         for audit in audits
     ]
-    Audit.objects.bulk_create(audits_to_create, 512)
+    res = Audit.objects.bulk_create(audits_to_create, 512)
+    print(f"Created {len(res)} audits.")
 
 
 class Migration(migrations.Migration):
@@ -827,4 +828,5 @@ class Migration(migrations.Migration):
             name="dailypageaudit",
             unique_together={("page", "audit", "date")},
         ),
+        migrations.RunPython(create_audit_entries)
     ]
