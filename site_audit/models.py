@@ -8,11 +8,26 @@ from users.models import Company
 
 
 class DailyCrawl(models.Model):
-    """Represents a daily crawl of a website."""
+    """Represents a daily crawl of a website + audits."""
     company = models.ForeignKey("users.Company", on_delete=models.CASCADE)
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=50, choices=CrawlStatus.choices, default=CrawlStatus.RUNNING)
+    pages_crawled = models.IntegerField(default=0)
+
+    @property
+    def duration(self) -> timedelta:
+        """Return the duration of the crawl."""
+        return self.finished_at - self.started_at
+
+
+class DailyPsiAudit(models.Model):
+    """Represents a run of PSI audits (lighthouse) on all pages of a website."""
+    company = models.ForeignKey("users.Company", on_delete=models.CASCADE)
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=50, choices=CrawlStatus.choices, default=CrawlStatus.RUNNING)
+    pages_audited = models.IntegerField(default=0)
 
     @property
     def duration(self) -> timedelta:

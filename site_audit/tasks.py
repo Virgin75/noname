@@ -14,6 +14,7 @@ import django
 import modal
 from modal import Image
 
+
 site_audit = modal.App("site_audit")
 django_app_image = (
     Image.debian_slim(python_version="3.11")
@@ -79,7 +80,7 @@ class Crawler:
         self.visited_url = set()
         self.internal_links = []
         self.pages = set()
-        self_audits = []
+        self.audits = []
 
     def _init_worker(self, tls):
         """Initialize the Threads local storage with a Playwright instance."""
@@ -139,6 +140,21 @@ class Crawler:
                 internal_link = self._remove_trailing_slash(href)
                 yield internal_link
 
+    def _run_custom_audits(self, url: str, page_title: str, page_content: str) -> None:
+        """Run custom audits on the page."""
+        from site_audit.models import DailyPageAudit
+        from commons.utils import call_func_from_str
+        from site_audit.enums import AuditChoices
+
+        for audit in AuditChoices.get_custom_audits():
+            res = call_func_from_str(
+                audit.path, url=url, page_title=page_title, page_content=page_content, depth=self.current_depth
+            )
+            audit_obj = DailyPageAudit(
+                page_id=url, company=self.company, audit_id=audit.value, date=datetime.now().date(), audit_score=res
+            )
+            self.audits.append(audit_obj)
+
     def _check_resource(self, route: Route) -> None:
         """Abort requests for non-HTML/JS resources. We don't want to download them."""
         if route.request.resource_type in ["image", "media", "font", "stylesheet"]:
@@ -148,6 +164,7 @@ class Crawler:
             if any(script for script in exclude_list if script in route.request.url):
                 route.abort()
             else:
+                #TODO: check doc (might need fulfill)
                 res = route.fetch()
                 self.tls.current_page[threading.current_thread().name]["js"] += res.text()
                 route.continue_()
@@ -167,17 +184,19 @@ class Crawler:
                 page.route("**/*.*", self._check_resource)
                 sleep(randint(0, 6))
                 page.goto(url, timeout=self.timeout * 1000)
-                content = page.content()
+                content = str(page.content())
+                title = str(page.title())
                 sha = hashlib.sha256(self.tls.current_page[threading.current_thread().name]["js"].encode('utf-8') + content.encode('utf-8')).hexdigest()
                 print(f"done get page from thread: {threading.current_thread().name}")
+                #self._run_custom_audits(url, title, content)
                 page.close()
                 context.close()
                 browser.close()
                 self.pages.add(
                     Page(
-                        url=url, content_sha256=sha, last_crawl_at=datetime.now(),
-                        company=self.company, meta_title=page.title()
-                ))
+                        url=url, content_sha256=sha, last_crawl_at=datetime.now(), company=self.company
+                    )
+                )
                 return url, content
             except Exception as e:
                 print(f"Error: {e}")
@@ -232,9 +251,13 @@ def run_psi_audit(urls: list[str] = None, company_id: int = None):
     django.setup()
     import subprocess
     import json
+    from commons.utils import OpenAndCloseDbConnection
     from commons.utils import get_nested_value
-    from site_audit.enums import AuditChoices
-    from site_audit.models import DailyPageAudit
+    from site_audit.enums import AuditChoices, CrawlStatus
+    from site_audit.models import DailyPageAudit, DailyPsiAudit
+
+    with OpenAndCloseDbConnection():
+        DailyPsiAudit.objects.create(company_id=company_id, pages_audited=len(urls))
 
     audits = []
     for url in urls:
@@ -254,7 +277,7 @@ def run_psi_audit(urls: list[str] = None, company_id: int = None):
             # Create new 'DailyPageAudit' objects
             results = json.loads(stdout)
             for audit in AuditChoices.get_psi_audits():
-                audit_result = get_nested_value(results, audit.psi_path)
+                audit_result = get_nested_value(results, audit.path)
                 audits.append(
                     DailyPageAudit(
                         audit_id=audit.value,
@@ -264,7 +287,16 @@ def run_psi_audit(urls: list[str] = None, company_id: int = None):
                         company_id=company_id
                     )
                 )
-    DailyPageAudit.objects.bulk_create(audits, 1024)
+    with OpenAndCloseDbConnection():
+        daily_psi_stats = DailyPsiAudit.objects.get()
+        try:
+            DailyPageAudit.objects.bulk_create(audits, 1024)
+            daily_psi_stats.status = CrawlStatus.SUCCESS
+        except:
+            daily_psi_stats.status = CrawlStatus.FAILED
+        finally:
+            daily_psi_stats.finished_at = datetime.now()
+            daily_psi_stats.save()
 
 
 @site_audit.function(image=django_app_image, timeout=3600*3, secrets=[modal.Secret.from_name("database")])
@@ -291,9 +323,9 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
             existing_pages = Page.objects.filter(company_id=company_id).only("content_sha256").in_bulk(field_name="url")
             for page in crawler.pages:
                 if page.url in existing_pages and existing_pages[page.url].content_sha256 != page.content_sha256:
-                    updated_pages.append(page)
+                    updated_pages.append(page.url)
                 elif page.url not in existing_pages:
-                    new_pages.append(page)
+                    new_pages.append(page.url)
 
             # Create new pages in the database and update existing ones
             Page.objects.bulk_create(
@@ -303,7 +335,14 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
                 update_fields=["last_crawl_at", "content_sha256"],
                 unique_fields=["company", "url"]
             )
-            run_psi_audit.spawn(urls=updated_pages, company_id=company_id)
+
+            # Save custom audits already run
+            from site_audit.models import DailyPageAudit
+            DailyPageAudit.objects.bulk_create(crawler.audits, 1024)
+
+            # Run PSI audits on updated pages or new pages
+            run_psi_audit.spawn(urls=set(updated_pages + new_pages), company_id=company_id)
+
     except Exception as e:
         status = CrawlStatus.FAILED
     finally:
@@ -311,6 +350,7 @@ def crawl_website(company_id: int = None, crawl_id: int = None):
             crawl_log = DailyCrawl.objects.get(id=crawl_id)
             crawl_log.finished_at = datetime.now()
             crawl_log.status = status
+            crawl_log.pages_crawled = len(crawler.visited_url)
             crawl_log.save()
 
 

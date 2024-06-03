@@ -18,12 +18,12 @@ class AuditChoices(models.TextChoices):
         2. The category of the audit.
         3. The weight of the audit in the category score.
         4. The weight of the audit in the overall score.
-        5. The path to get the value from the Google Page Speed Insights audit (in json).
+        5. The path to get value from the Google Page Speed Insights audit (json) | function to call to run the audit.
         6. A description of the audit.
     """
-    CRAWL_DEPTH = ("CRAWL_DEPTH", "seo", 0, 1, None, "The current crawl depth of the page.", "CRAWL_DEPTH")
-    HAS_URL_ISSUES = ("HAS_URL_ISSUES",  "seo", 0, 1, None, "The crawled page has URL issues: non ascii char, params, space.", "HAS_URL_ISSUES")
-    HAS_ONLY_ONE_H1 = ("HAS_ONLY_ONE_H1", "seo", 0, 1, None, "The crawled page has only one H1 tag.", "HAS_ONLY_ONE_H1")
+    CRAWL_DEPTH = ("CRAWL_DEPTH", "seo", 0, 1, "site_audit.audits.crawl_depth", "The current crawl depth of the page.", "CRAWL_DEPTH")
+    HAS_URL_ISSUES = ("HAS_URL_ISSUES",  "seo", 0, 1, "site_audit.audits.has_url_issues", "The crawled page has URL issues: non ascii char, params, space.", "HAS_URL_ISSUES")
+    HAS_ONLY_ONE_H1 = ("HAS_ONLY_ONE_H1", "seo", 0, 1, "site_audit.audits.has_only_one_h1", "The crawled page has only one H1 tag.", "HAS_ONLY_ONE_H1")
 
     # Google Page Speed insights Performance metrics/audits
     PSI_PERFORMANCE_SCORE = ("PSI_PERFORMANCE_SCORE",  "perf", 0, 1, "categories.performance.score", "The Google Page Speed Insights performance score.", "PERFORMANCE_SCORE")
@@ -180,14 +180,14 @@ class AuditChoices(models.TextChoices):
     PSI_VALID_SOURCE_MAPS = ("PSI_VALID-SOURCE-MAPS", "seo", 0, 1, "audits.valid-source-maps.score", "Source maps translate minified code to the original source code. This helps developers debug in production. In addition, Lighthouse is able to provide further insights. Consider deploying source maps to take advantage of these benefits. [Learn more about source maps](https://developer.chrome.com/docs/devtools/javascript/source-maps/).", "VALID_SOURCE_MAPS")
     PSI_INSPECTOR_ISSUES = ("PSI_INSPECTOR-ISSUES", "seo", 1, 1, "audits.inspector-issues.score", "Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns. Open up the Issues panel in Chrome DevTools for more details on each issue.", "INSPECTOR_ISSUES")
 
-    def __new__(cls, value, category, category_weight, global_weight, psi_path, description):
+    def __new__(cls, value, category, category_weight, global_weight, path, description):
         """Add the path in dict to get the value (from psi insights audit)."""
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj.category = category
         obj.category_weight = category_weight
         obj.global_weight = global_weight
-        obj.psi_path = psi_path
+        obj.path = path
         obj.description = description
         return obj
 
@@ -195,5 +195,10 @@ class AuditChoices(models.TextChoices):
     def get_psi_audits(cls) -> list:
         """Return the list of PSI audits."""
         return [cls(audit) for audit in cls.values if audit.startswith("PSI_")]
+
+    @classmethod
+    def get_custom_audits(cls) -> list:
+        """Return the list of custom audits."""
+        return [cls(audit) for audit in cls.values if not audit.startswith("PSI_")]
 
 
